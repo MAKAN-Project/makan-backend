@@ -31,14 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'sessions_app',
+    #'sessions_app',
     'users',
-    'airequests',
-    'category',
+    #'airequests',
+    #'category',
     'engineers',
-    'files',
-    'models3d',
-    'payments',
+    #'files',
+    #'models3d',
+    #'payments',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +62,7 @@ ROOT_URLCONF = 'makan_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "makan_project" / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
