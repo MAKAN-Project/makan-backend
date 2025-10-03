@@ -1,8 +1,144 @@
 {% extends "base.html" %}
 
-{% block title %}Engineers Dashboard{% endblock %}
+{% block title %}Engineer Dashboard{% endblock %}
 
 {% block content %}
-<h2>Welcome to Engineers Dashboard</h2>
-<p>Here is your content for engineers.</p>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <h5 class="sidebar-heading px-3 mt-4 mb-1 text-muted">Engineer Dashboard</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link active" href="{% url 'engineers_dashboard' %}">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Sessions</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Files / Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">AI Preview</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">3D Models</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+      <!-- Dashboard Overview -->
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Workspace Overview</h1>
+      </div>
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Active Requests</h5>
+              <p class="card-text display-6">{{ pending_requests_count }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Upcoming Sessions</h5>
+              <p class="card-text display-6">{{ upcoming_sessions_count }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Completed Projects</h5>
+              <p class="card-text display-6">{{ completed_projects_count }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Requests Table -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header"><h5>Active Requests</h5></div>
+        <div class="card-body table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Service</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Requested At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for request in requests %}
+              <tr>
+                <td>{{ request.user.username }}</td>
+                <td>{{ request.service_type }}</td>
+                <td>{{ request.description }}</td>
+                <td>{{ request.priority }}</td>
+                <td>{{ request.scheduled_at }}</td>
+                <td>
+                  <a href="{% url 'accept_request' request.id %}" class="btn btn-success btn-sm">Accept</a>
+                  <a href="{% url 'reject_request' request.id %}" class="btn btn-danger btn-sm">Reject</a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted">No active requests</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Today's Meetings -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header"><h5>Today's Meetings</h5></div>
+        <div class="card-body table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Client</th>
+                <th>Type</th>
+                <th>Duration</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for session in sessions %}
+              <tr>
+                <td>{{ session.scheduled_at|date:"H:i" }}</td>
+                <td>{{ session.user.username }}</td>
+                <td>{{ session.sessionscol }}</td>
+                <td>{{ session.duration|default:"45 min" }}</td>
+                <td><a href="{{ session.meeting_link }}" target="_blank" class="btn btn-primary btn-sm">Join</a></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted">No meetings scheduled</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header"><h5>Quick Actions</h5></div>
+        <div class="card-body d-flex flex-wrap gap-2">
+          <a href="#" class="btn btn-primary">Create Session</a>
+          <a href="#" class="btn btn-success">Upload Design</a>
+          <a href="#" class="btn btn-warning">AI Preview</a>
+          <a href="#" class="btn btn-info">3D Models</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
 {% endblock %}

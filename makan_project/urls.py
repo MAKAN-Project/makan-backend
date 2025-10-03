@@ -21,13 +21,13 @@ from django.urls import path,include
 urlpatterns = [
     #path('admin/', admin.site.urls),
     #path('admin/', admin.site.urls),                # لوحة الإدارة
-    #path('sessions/', include('sessions_app.urls')), # كل روابط جلساتك
-   # path('users/', include('users.urls')),          # روابط users
-    #path('requests/', include('airequests.urls')),  # روابط airequests
-    #path('category/', include('category.urls')),    # روابط category
+    path('sessions/', include('sessions_app.urls')), # كل روابط جلساتك
+    path('users/', include('users.urls')),          # روابط users
+    path('requests/', include('airequests.urls')),  # روابط airequests
+    path('category/', include('category.urls')),    # روابط category
     path('engineers/', include('engineers.urls')),  # روابط engineers
-    #path('files/', include('files.urls')),          # روابط files
-    #path('models3d/', include('models3d.urls')),    # روابط models3d
-    #path('payments/', include('payments.urls')),    # روابط payments
+    path('files/', include('files.urls')),          # روابط files
+    path('models3d/', include('models3d.urls')),    # روابط models3d
+    path('payments/', include('payments.urls')),    # روابط payments
 
 ]
