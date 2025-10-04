@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'projectrequests',
     'sessions_app',
     'users',
     'airequests',
