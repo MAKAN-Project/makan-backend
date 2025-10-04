@@ -1,0 +1,43 @@
+/* Dark sidebar with glowing scroll */
+.sidebar {
+    background:#343a40;
+    overflow-y: auto !important;
+    max-height: 100vh !important;
+    border-right: 2px solid #0ff;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #0ff; 
+    border-radius: 4px;
+    box-shadow: 0 0 5px #0ff;
+}
+
+.navbar {
+    background: linear-gradient(90deg, #0ff, #06f);
+    color: white !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px #0ff;
+}
+
+.jazzmin-welcome {
+    font-size: 1.4em;
+    color: #0ff;
+    text-shadow: 0 0 8px #0ff, 0 0 15px #06f;
+}
+
+a.nav-link {
+    color: #fff !important;
+}
+
+a.nav-link:hover {
+    color: #0ff !important;
+    text-shadow: 0 0 5px #0ff;
+}
