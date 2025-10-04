@@ -1,3 +1,15 @@
+
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# For collectstatic (absolute path on your PC)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 """
 Django settings for makan_project project.
 
@@ -31,6 +43,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin', 
     'sessions_app',
     'users',
     'airequests',
@@ -79,6 +92,8 @@ WSGI_APPLICATION = 'makan_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+
 
 
 
@@ -134,3 +149,49 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "🌌 Makan Admin Space",
+    "site_header": "Makan Admin Panel",
+    "site_brand": "Makan",
+    "welcome_sign": "Welcome back, Galactic Admin! 🌠",
+    "copyright": "Makan © 2025",
+    "search_model": "users.User",
+    "show_ui_builder": True,
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "/", "permissions": ["auth.view_user"]},
+        {"name": "Docs", "url": "https://docs.makan.com", "new_window": True},
+        {"name": "Support", "url": "/admin/support/", "permissions": ["auth.view_user"]},
+    ],
+    "icons": {
+        "auth": "fas fa-user-shield",
+        "users": "fas fa-user-astronaut",
+        "engineers": "fas fa-hard-hat",
+        "category": "fas fa-layer-group",
+        "airequests": "fas fa-robot",
+        "files": "fas fa-file-invoice",
+        "payments": "fas fa-credit-card",
+        "sessions": "fas fa-calendar-check",
+    },
+    "default_icon_parents": "fas fa-folder-plus",
+    "default_icon_children": "fas fa-file-circle",
+    "show_sidebar": True,
+    "custom_css": "css/style.css",
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "body_fixed": True,
+    "sidebar_fixed": True,
+    "sidebar_scrollable": True,
+    "navbar_fixed": True,
+    "footer_fixed": False,
+    "no_navbar_border": True,
+    "brand_color": "bg-dark text-white",
+    "accent": "accent-info",
+    "navbar": "navbar-dark bg-dark",
+    "logo_padding": "p-3",
+    "navbar_small_text": False,
+    "footer_small_text": True,
+    "body_small_text": False,
+}
+
