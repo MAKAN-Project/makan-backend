@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <h3 class="mb-4 text-center">
+            <i class="bi bi-tools me-2"></i> Complete Engineer Profile
+          </h3>
+
+          {% for message in messages %}
+            <div class="alert 
+              {% if 'error' in message.tags %}alert-danger
+              {% elif 'success' in message.tags %}alert-success
+              {% else %}alert-info{% endif %} alert-dismissible fade show">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              {{ form.education.label_tag }} 
+              {{ form.education }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.certifications.label_tag }} 
+              {{ form.certifications }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.licenses.label_tag }} 
+              {{ form.licenses }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.bio.label_tag }} 
+              {{ form.bio }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.profile_photo.label_tag }}
+              {{ form.profile_photo }}
+              <div class="mt-2">
+                <img id="previewImg" src="{% static 'images/default-profile.png' %}" 
+                     class="img-thumbnail" width="150">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              {{ form.portfolio.label_tag }}
+              {{ form.portfolio }}
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+              <i class="bi bi-check-circle me-1"></i> Save Profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS لعرض معاينة الصورة -->
+<script>
+  document.querySelector('input[name="profile_photo"]').addEventListener("change", function (e) {
+    const [file] = this.files;
+    if (file) {
+      document.getElementById("previewImg").src = URL.createObjectURL(file);
+    }
+  });
+</script>
+{% endblock %}
