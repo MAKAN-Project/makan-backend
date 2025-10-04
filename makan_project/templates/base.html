@@ -14,10 +14,66 @@
 <body>
     <header>
         <h1>Makan Project</h1>
-        <nav>
-            <a href="{% url 'engineers_dashboard' %}">Engineers</a>
-           
-        </nav>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Makan</a>
+    
+    <!-- Toggle button for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav ms-auto">
+        <!-- Notifications Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell-fill fs-5"></i>
+            {% if recent_requests %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ recent_requests|length }}
+              <span class="visually-hidden">unread notifications</span>
+            </span>
+            {% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationsDropdown" style="width: 300px;">
+            <li class="dropdown-header fw-bold">Latest Requests</li>
+            {% if recent_requests %}
+              {% for req in recent_requests %}
+              <li>
+                <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'accept_request' req.ai_request_id %}">
+                  <div>
+                    <strong>{{ req.user.username }}</strong> requested <em>{{ req.service_type }}</em>
+                    <div class="text-muted small">{{ req.created_at|timesince }} ago</div>
+                  </div>
+                  <span class="badge bg-success">New</span>
+                </a>
+              </li>
+              {% endfor %}
+            {% else %}
+              <li class="dropdown-item text-center text-muted">No new notifications</li>
+            {% endif %}
+          </ul>
+        </li>
+
+        <!-- User Dropdown -->
+        <li class="nav-item dropdown ms-3">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-5"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'logout_user' %}">Logout</a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
     </header>
 
     <main>
