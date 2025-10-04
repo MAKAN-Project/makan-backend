@@ -5,7 +5,8 @@ from sessions_app.models import Session
 from .models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-   
+
+
 def login_register(request):
     return render(request, "login_register.html")
 
@@ -74,3 +75,48 @@ def login_user(request):
         else:
             messages.error(request, "Email not found", extra_tags='login')
     return redirect('login_register')
+
+def customer_dashboard(request):
+    # تحقق إذا المستخدم مسجل دخول
+    if 'user_id' not in request.session:
+        messages.error(request, "Please log in first")
+        return redirect('login_register')
+    
+    # تحقق إذا المستخدم customer
+    if request.session.get('role') != 'customer':
+        messages.error(request, "Access denied")
+        return redirect('home')
+    
+    user_id = request.session['user_id']
+    
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "User not found")
+        return redirect('login_register')
+    
+    # جلب البيانات المطلوبة
+    ai_requests = AIRequest.objects.filter(user_id=user_id).order_by('-created_at')
+    
+    # الجلسات القادمة
+    from datetime import datetime
+    upcoming_sessions = Session.objects.filter(
+        user_id=user_id, 
+        scheduled_at__gte=datetime.now()
+    ).order_by('scheduled_at')[:3]
+    
+    # جلب 3D models
+    from models3d.models import Model3D
+    user_3d_models = Model3D.objects.filter(user_id=user_id)
+    
+    context = {
+        'user': user,
+        'recent_ai_requests': ai_requests[:5],
+        'upcoming_sessions': upcoming_sessions,
+        'total_requests': ai_requests.count(),
+        'pending_requests': 0,  
+        'total_sessions': Session.objects.filter(user_id=user_id).count(),
+        'total_3d_models': user_3d_models.count(),
+    }
+    
+    return render(request, "customer_dashboard.html", context)
