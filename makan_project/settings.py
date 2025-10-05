@@ -42,8 +42,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+
 INSTALLED_APPS = [
-    'jazzmin', 
+    'jazzmin',
+    'projectrequests',
     'sessions_app',
     'users',
     'airequests',
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
