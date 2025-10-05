@@ -1,3 +1,78 @@
+# --- Reschedule Session ---
+from sessions_app.models import Session
+from django.shortcuts import redirect
+def reschedule_session(request, session_id):
+    if request.method == 'POST':
+        new_time = request.POST.get('new_scheduled_at')
+        session = Session.objects.get(id=session_id)
+        session.scheduled_at = new_time
+        session.status = 'pending_approval'  # Add this status to your model if not present
+        session.save()
+        # Optionally notify engineer here
+        return redirect('customer_dashboard')
+    return redirect('customer_dashboard')
+# --- Building Project Stage Selection ---
+def choose_building_stage(request):
+    return render(request, 'choose_building_stage.html')
+
+def engineering_fields(request, stage):
+    from engineers.models import Engineer
+    context = {'stage': stage}
+    if stage == 'empty_land':
+        context['architecture_engineers'] = Engineer.objects.filter(education__icontains='architecture')
+        context['civil_engineers'] = Engineer.objects.filter(education__icontains='civil')
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        context['mechanical_engineers'] = Engineer.objects.filter(education__icontains='mechanical')
+        return render(request, 'engineering_fields_empty_land.html', context)
+    elif stage == 'empty_apartment':
+        context['architecture_engineers'] = Engineer.objects.filter(education__icontains='architecture')
+        context['mechanical_engineers'] = Engineer.objects.filter(education__icontains='mechanical')
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        return render(request, 'engineering_fields_empty_apartment.html', context)
+    elif stage == 'with_walls':
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        context['mechanical_engineers'] = Engineer.objects.filter(education__icontains='mechanical')
+        return render(request, 'engineering_fields_with_walls.html', context)
+    elif stage == 'decorate':
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        return render(request, 'engineering_fields_decorate.html', context)
+    else:
+        context['architecture_engineers'] = []
+        context['civil_engineers'] = []
+        context['interior_engineers'] = []
+        context['mechanical_engineers'] = []
+        return render(request, 'engineering_fields.html', context)
+    if stage == 'empty_land':
+        context['architecture_engineers'] = Engineer.objects.filter(education__icontains='architecture')
+        context['civil_engineers'] = Engineer.objects.filter(education__icontains='civil')
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        context['mechanical_engineers'] = Engineer.objects.filter(education__icontains='mechanical')
+        return render(request, 'engineering_fields_empty_land.html', context)
+    elif stage == 'empty_apartment':
+        context['architecture_engineers'] = Engineer.objects.filter(education__icontains='architecture')
+        context['mechanical_engineers'] = Engineer.objects.filter(education__icontains='mechanical')
+        context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
+        return render(request, 'engineering_fields_empty_apartment.html', context)
+    else:
+        context['architecture_engineers'] = []
+        context['civil_engineers'] = []
+        context['interior_engineers'] = []
+        context['mechanical_engineers'] = []
+        return render(request, 'engineering_fields.html', context)
+# --- Customer Dashboard Form Actions ---
+def reserve_session(request):
+    # TODO: Implement reservation logic
+    return redirect('customer_dashboard')
+
+def upload_room_photo(request):
+    # TODO: Implement room photo upload logic
+    return redirect('customer_dashboard')
+
+def create_building_project(request):
+    # TODO: Implement building project creation logic
+    return redirect('customer_dashboard')
+def home(request):
+    return customer_dashboard(request)
 from django.shortcuts import render,redirect
 from airequests.models import AIRequest
 from engineers.models import Engineer
@@ -14,6 +89,36 @@ def logout_user(request):
     request.session.flush()
     messages.success(request, "Logged out successfully")
     return redirect('home')
+
+# --- Customer Files Page ---
+def customer_files(request):
+    from files.models import File
+    from airequests.models import AIRequest
+    user_id = request.session.get('user_id')
+    user_images = []
+    # Get File model images uploaded by user
+    file_images = File.objects.filter(user_id=user_id, type__icontains='image')
+    for f in file_images:
+        user_images.append({'url': f.path, 'name': f.file_name})
+
+    # Get images from AIRequest (input and output images)
+    ai_images = AIRequest.objects.filter(user_id=user_id)
+    for req in ai_images:
+        if req.input_image_path:
+            user_images.append({'url': req.input_image_path, 'name': 'AI Input'})
+        if req.output_images_paths:
+            # If multiple output images, split by comma
+            for out_img in req.output_images_paths.split(','):
+                user_images.append({'url': out_img.strip(), 'name': 'AI Output'})
+
+    # TODO: Populate engineer_images, engineer_pdfs, engineer_cad_files from File model (received files)
+    context = {
+        'user_uploaded_images': user_images,
+        'engineer_images': [],
+        'engineer_pdfs': [],
+        'engineer_cad_files': [],
+    }
+    return render(request, 'customer_files.html', context)
 
 # ===== User Management =====
 def create_user(request):
@@ -101,14 +206,29 @@ def customer_dashboard(request):
     # الجلسات القادمة
     from datetime import datetime
     upcoming_sessions = Session.objects.filter(
-        user_id=user_id, 
-        scheduled_at__gte=datetime.now()
+        user_id=user_id,
+        scheduled_at__gte=datetime.now(),
+        status='approved'
     ).order_by('scheduled_at')[:3]
     
     # جلب 3D models
     from models3d.models import Model3D
     user_3d_models = Model3D.objects.filter(user_id=user_id)
     
+
+    from .forms import ReserveConsultingSessionForm, UploadRoomPhotoForm, CreateBuildingProjectForm
+    # Get all approved engineers
+    engineer_qs = Engineer.objects.filter(status="approved")
+    # Example: Use education field as type (customize as needed)
+    engineer_types = sorted(set(e.education for e in engineer_qs if e.education))
+    engineer_type_choices = [(et, et) for et in engineer_types]
+    engineer_choices = [(e.eng_id, f"{e.user.first_name} {e.user.last_name}") for e in engineer_qs]
+    reserve_consulting_session_form = ReserveConsultingSessionForm()
+    reserve_consulting_session_form.fields['engineer_type'].choices = engineer_type_choices
+    reserve_consulting_session_form.fields['engineer_id'].choices = engineer_choices
+    upload_room_photo_form = UploadRoomPhotoForm()
+    create_building_project_form = CreateBuildingProjectForm()
+
     context = {
         'user': user,
         'recent_ai_requests': ai_requests[:5],
@@ -117,6 +237,9 @@ def customer_dashboard(request):
         'pending_requests': 0,  
         'total_sessions': Session.objects.filter(user_id=user_id).count(),
         'total_3d_models': user_3d_models.count(),
+        'reserve_consulting_session_form': reserve_consulting_session_form,
+        'upload_room_photo_form': upload_room_photo_form,
+        'create_building_project_form': create_building_project_form,
     }
     
     return render(request, "customer_dashboard.html", context)

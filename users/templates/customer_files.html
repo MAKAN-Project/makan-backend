@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}My Files - MAKAN{% endblock %}
+
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'style/style.css' %}">
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <h5 class="sidebar-heading px-3 mt-4 mb-1 text-muted">Customer Dashboard</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">My AI Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">My Sessions</a></li>
+          <li class="nav-item"><a class="nav-link active" href="{% url 'customer_files' %}">My Files</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">3D Models</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <h2 class="mb-4">My Files</h2>
+      <!-- User Uploaded Images -->
+      <section class="mb-5">
+        <h4>User Uploaded Images</h4>
+        <div class="row">
+          {% for img in user_uploaded_images %}
+          <div class="col-md-3 mb-3">
+            <div class="card">
+              <img src="{{ img.url }}" class="card-img-top" alt="User Image">
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted">No images uploaded yet.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Files Received from Engineer -->
+      <section>
+        <h4>Files Received from Engineer</h4>
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <h5>Images</h5>
+            {% for img in engineer_images %}
+            <div class="mb-2">
+              <img src="{{ img.url }}" class="img-fluid rounded" alt="Engineer Image">
+            </div>
+            {% empty %}
+            <p class="text-muted">No images received.</p>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <h5>PDF Files</h5>
+            <ul class="list-group">
+              {% for pdf in engineer_pdfs %}
+              <li class="list-group-item">
+                <a href="{{ pdf.url }}" target="_blank">{{ pdf.name }}</a>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-muted">No PDFs received.</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h5>AutoCAD Files</h5>
+            <ul class="list-group">
+              {% for cad in engineer_cad_files %}
+              <li class="list-group-item">
+                <a href="{{ cad.url }}" target="_blank">{{ cad.name }}</a>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-muted">No AutoCAD files received.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+{% endblock %}

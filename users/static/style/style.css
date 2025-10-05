@@ -1,0 +1,35 @@
+/* Action Card Buttons */
+.action-card-btn {
+  width: 220px;
+  height: 220px;
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  margin-right: 24px;
+  margin-bottom: 12px;
+  transition: transform 0.2s;
+}
+.action-card-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+.reserve-bg {
+  background-image: url('/static/img/consulting.jpg');
+  background-color: #198754;
+}
+.room-bg {
+  background-image: url('/static/img/room.jpg');
+  background-color: #0dcaf0;
+}
+.building-bg {
+  background-image: url('/static/img/building.jpg');
+  background-color: #ffc107;
+}
