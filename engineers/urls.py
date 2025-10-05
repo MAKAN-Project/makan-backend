@@ -2,10 +2,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.dashboard, name='engineers_dashboard'),
-  
-    path("complete-profile/", views.engineer_complete_profile, name="engineer_complete_profile"),
-          # الصفحة الرئيسية للمهندسين
-    #path('projects/', views.projects, name='engineers_projects'),  # صفحة المشاريع
-    #path('profile/<int:id>/', views.profile, name='engineers_profile'), # صفحة البروفايل
+    path('dashboard/', views.dashboard, name='engineers_dashboard'),
+    path('complete-profile/', views.engineer_complete_profile, name='engineer_complete_profile'),
+
+    # تحديث حالة طلب AI
+    path('ai-request/<int:request_id>/accept/', views.accept_ai_request, name='accept_ai_request'),
+    path('ai-request/<int:request_id>/reject/', views.reject_ai_request, name='reject_ai_request'),
+
+    # تحديث حالة طلب مشروع
+    path('project-request/<int:request_id>/accept/', views.accept_project_request, name='accept_project_request'),
+    path('project-request/<int:request_id>/reject/', views.reject_project_request, name='reject_project_request'),
 ]
