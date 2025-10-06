@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'style/style.css' %}">
+
+{% block title %}Engineering Fields - Decorate & Redecorate{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Engineering Fields for Decorate & Redecorate</h2>
+  <div class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Interior Design</h5>
+          <ul class="list-group list-group-flush">
+            {% for engineer in interior_engineers %}
+            <li class="list-group-item">
+              {{ engineer.first_name }} {{ engineer.last_name }}
+              <span class="text-muted small">({{ engineer.email }})</span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No interior design engineers available.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
