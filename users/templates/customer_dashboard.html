@@ -33,93 +33,146 @@
             </a>
         </div>
       </div>
-      <!-- Action Buttons -->
-      {% load static %}
-      <link rel="stylesheet" href="{% static 'style/style.css' %}">
-      <div class="mb-4 d-flex flex-wrap gap-3">
-        <button type="button" class="action-card-btn reserve-bg" data-bs-toggle="modal" data-bs-target="#reserveSessionModal">
-          <span>Reserve Consulting Session</span>
-        </button>
-        <button type="button" class="action-card-btn room-bg" data-bs-toggle="modal" data-bs-target="#uploadRoomModal">
-          <span>Upload Room Photo & Add Furniture</span>
-        </button>
-        <button type="button" class="action-card-btn building-bg" data-bs-toggle="modal" data-bs-target="#chooseBuildingStageModal">
-          <span>Create Building Project</span>
-        </button>
 
-      <!-- Choose Building Stage Modal -->
-      <div class="modal fade" id="chooseBuildingStageModal" tabindex="-1" aria-labelledby="chooseBuildingStageLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h4 class="modal-title fw-bold" id="chooseBuildingStageLabel">
-                <i class="bi bi-house-door me-2"></i> Choose Your Building Stage
-              </h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Action Buttons -->
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'style/style.css' %}">
+        <div class="mb-4 d-flex flex-wrap gap-3">
+          <button type="button" class="action-card-btn reserve-bg" data-bs-toggle="modal" data-bs-target="#reserveSessionModal">
+            <span>Reserve Consulting Session</span>
+          </button>
+          <button type="button" class="action-card-btn room-bg" data-bs-toggle="modal" data-bs-target="#uploadRoomModal">
+            <span>Upload Room Photo & Add Furniture</span>
+          </button>
+          <button type="button" class="action-card-btn building-bg" data-bs-toggle="modal" data-bs-target="#chooseBuildingStageModal">
+            <span>Create Building Project</span>
+          </button>
+        </div>
+
+        <!-- Visible Choose Your Building Stage Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h4 class="fw-bold mb-0">
+              <i class="bi bi-house-door me-2"></i> Choose Your Building Stage
+            </h4>
+          </div>
+          <div class="card-body py-4">
+            <div class="row g-4 justify-content-center">
+              <div class="col-12 mb-3 text-center">
+                <p class="lead">Select the stage that best matches your project. Each option will show you the engineering fields and experts you need.</p>
+              </div>
+              <div class="col-md-6 col-lg-3">
+                <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                  <div class="card-body text-center">
+                    <i class="bi bi-tree display-4 mb-2 text-success"></i>
+                    <h5 class="card-title">Build from Scratch</h5>
+                    <p class="card-text small">Start with an empty land and build your dream home.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-6 col-lg-3">
+                <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                  <div class="card-body text-center">
+                    <i class="bi bi-building display-4 mb-2 text-info"></i>
+                    <h5 class="card-title">Empty Apartment/House</h5>
+                    <p class="card-text small">You have an empty apartment or house ready for work.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-6 col-lg-3">
+                <a href="{% url 'engineering_fields' stage='with_walls' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                  <div class="card-body text-center">
+                    <i class="bi bi-bricks display-4 mb-2 text-warning"></i>
+                    <h5 class="card-title">With Inner Walls</h5>
+                    <p class="card-text small">The inner walls are ready, move to the next step.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-6 col-lg-3">
+                <a href="{% url 'engineering_fields' stage='decorate' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                  <div class="card-body text-center">
+                    <i class="bi bi-palette display-4 mb-2 text-danger"></i>
+                    <h5 class="card-title">Decorate / Redecorate</h5>
+                    <p class="card-text small">Decorate a ready apartment/house or redecorate your space.</p>
+                  </div>
+                </a>
+              </div>
             </div>
-            <div class="modal-body py-4">
-              <div class="row g-4 justify-content-center">
-                <div class="col-12 mb-3 text-center">
-                  <p class="lead">Select the stage that best matches your project. Each option will show you the engineering fields and experts you need.</p>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                  <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                    <div class="card-body text-center">
-                      <i class="bi bi-tree display-4 mb-2 text-success"></i>
-                      <h5 class="card-title">Build from Scratch</h5>
-                      <p class="card-text small">Start with an empty land and build your dream home.</p>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                  <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                    <div class="card-body text-center">
-                      <i class="bi bi-building display-4 mb-2 text-info"></i>
-                      <h5 class="card-title">Empty Apartment/House</h5>
-                      <p class="card-text small">You have an empty apartment or house ready for work.</p>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                  <a href="{% url 'engineering_fields' stage='with_walls' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                    <div class="card-body text-center">
-                      <i class="bi bi-bricks display-4 mb-2 text-warning"></i>
-                      <h5 class="card-title">With Inner Walls</h5>
-                      <p class="card-text small">The inner walls are ready, move to the next step.</p>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                  <a href="{% url 'engineering_fields' stage='decorate' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                    <div class="card-body text-center">
-                      <i class="bi bi-palette display-4 mb-2 text-danger"></i>
-                      <h5 class="card-title">Decorate / Redecorate</h5>
-                      <p class="card-text small">Decorate a ready apartment/house or redecorate your space.</p>
-                    </div>
-                  </a>
+          </div>
+        </div>
+
+        <!-- Choose Building Stage Modal (kept) -->
+        <div class="modal fade" id="chooseBuildingStageModal" tabindex="-1" aria-labelledby="chooseBuildingStageLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title fw-bold" id="chooseBuildingStageLabel">
+                  <i class="bi bi-house-door me-2"></i> Choose Your Building Stage
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body py-4">
+                <div class="row g-4 justify-content-center">
+                  <div class="col-12 mb-3 text-center">
+                    <p class="lead">Select the stage that best matches your project. Each option will show you the engineering fields and experts you need.</p>
+                  </div>
+                  <div class="col-md-6 col-lg-3">
+                    <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                      <div class="card-body text-center">
+                        <i class="bi bi-tree display-4 mb-2 text-success"></i>
+                        <h5 class="card-title">Build from Scratch</h5>
+                        <p class="card-text small">Start with an empty land and build your dream home.</p>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-6 col-lg-3">
+                    <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                      <div class="card-body text-center">
+                        <i class="bi bi-building display-4 mb-2 text-info"></i>
+                        <h5 class="card-title">Empty Apartment/House</h5>
+                        <p class="card-text small">You have an empty apartment or house ready for work.</p>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-6 col-lg-3">
+                    <a href="{% url 'engineering_fields' stage='with_walls' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                      <div class="card-body text-center">
+                        <i class="bi bi-bricks display-4 mb-2 text-warning"></i>
+                        <h5 class="card-title">With Inner Walls</h5>
+                        <p class="card-text small">The inner walls are ready, move to the next step.</p>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-6 col-lg-3">
+                    <a href="{% url 'engineering_fields' stage='decorate' %}" class="card building-stage-card text-decoration-none text-dark h-100">
+                      <div class="card-body text-center">
+                        <i class="bi bi-palette display-4 mb-2 text-danger"></i>
+                        <h5 class="card-title">Decorate / Redecorate</h5>
+                        <p class="card-text small">Decorate a ready apartment/house or redecorate your space.</p>
+                      </div>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <style>
-        .building-stage-card {
-          transition: box-shadow 0.2s, transform 0.2s;
-          border-radius: 1rem;
-          border: 2px solid #e3e3e3;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .building-stage-card:hover {
-          box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-          border-color: #0d6efd;
-          transform: translateY(-4px) scale(1.03);
-        }
-        .modal-header {
-          border-bottom: 2px solid #0d6efd;
-        }
-      </style>
-      </div>
+        <style>
+          .building-stage-card {
+            transition: box-shadow 0.2s, transform 0.2s;
+            border-radius: 1rem;
+            border: 2px solid #e3e3e3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          }
+          .building-stage-card:hover {
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            border-color: #0d6efd;
+            transform: translateY(-4px) scale(1.03);
+          }
+          .modal-header {
+            border-bottom: 2px solid #0d6efd;
+          }
+        </style>
 
       <!-- Reserve Consulting Session Modal -->
       <div class="modal fade" id="reserveSessionModal" tabindex="-1" aria-labelledby="reserveSessionLabel" aria-hidden="true">
