@@ -6,57 +6,191 @@
 
 {% block content %}
 <div class="container py-5">
+  <script>
+    function showEngineers(carouselId, startIdx, visibleCount) {
+      const carousel = document.getElementById(carouselId);
+      const cards = carousel.querySelectorAll('.engineer-card');
+      cards.forEach((card, idx) => {
+        card.style.display = (idx >= startIdx && idx < startIdx + visibleCount) ? 'flex' : 'none';
+      });
+      carousel.dataset.startIdx = startIdx;
+    }
+    function scrollEngineers(carouselId, direction) {
+      const carousel = document.getElementById(carouselId);
+      const cards = carousel.querySelectorAll('.engineer-card');
+      const visibleCount = 3;
+      let startIdx = parseInt(carousel.dataset.startIdx || '0');
+      startIdx += direction * visibleCount;
+      if (startIdx < 0) startIdx = 0;
+      if (startIdx > cards.length - visibleCount) startIdx = Math.max(cards.length - visibleCount, 0);
+      showEngineers(carouselId, startIdx, visibleCount);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      ['architecture-carousel','mechanical-carousel','interior-carousel'].forEach(function(id){
+        if(document.getElementById(id)) showEngineers(id, 0, 3);
+      });
+    });
+  </script>
   <h2 class="mb-4">Engineering Fields for Empty Apartment</h2>
-  <div class="row">
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Architecture</h5>
-          <ul class="list-group list-group-flush">
+  <div class="d-flex flex-column gap-4">
+    <!-- Architecture Field -->
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Architecture</h5>
+        <div class="position-relative">
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('architecture-carousel', -1)">&lt;</button>
+          <div id="architecture-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in architecture_engineers %}
-            <li class="list-group-item">
-              {{ engineer.first_name }} {{ engineer.last_name }}
-              <span class="text-muted small">({{ engineer.email }})</span>
-            </li>
+            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#engineerModal{{ engineer.id }}">
+              <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+              <div class="card-body text-center">
+                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
+              </div>
+            </div>
+            <!-- Engineer Modal -->
+            <div class="modal fade" id="engineerModal{{ engineer.id }}" tabindex="-1" aria-labelledby="engineerModalLabel{{ engineer.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="engineerModalLabel{{ engineer.id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="img-fluid rounded mb-3" alt="Engineer Photo">
+                    <p><strong>Email:</strong> {{ engineer.user.email }}</p>
+                    <p><strong>Specialty:</strong> {{ engineer.specialty|default:'Architecture' }}</p>
+                    <form method="post" action="/book-session/" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="sessionDate{{ engineer.id }}" class="form-label">Book a Session</label>
+                        <input type="datetime-local" class="form-control" id="sessionDate{{ engineer.id }}" name="session_date" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="customerFiles{{ engineer.id }}" class="form-label">Upload Files/Images</label>
+                        <input type="file" class="form-control" id="customerFiles{{ engineer.id }}" name="customer_files" multiple>
+                      </div>
+                      <input type="hidden" name="engineer_id" value="{{ engineer.id }}">
+                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
             {% empty %}
-            <li class="list-group-item text-muted">No architecture engineers available.</li>
+            <div class="text-muted">No architecture engineers available.</div>
             {% endfor %}
-          </ul>
+          </div>
+          <script>document.getElementById('architecture-carousel').dataset.startIdx = 0;</script>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('architecture-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Mechanical Engineering</h5>
-          <p class="small text-muted">Plumbing, Heating & Cooling</p>
-          <ul class="list-group list-group-flush">
+    <!-- Mechanical Engineering Field -->
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Mechanical Engineering</h5>
+        <p class="small text-muted">Plumbing, Heating & Cooling</p>
+        <div class="position-relative">
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('mechanical-carousel', -1)">&lt;</button>
+          <div id="mechanical-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in mechanical_engineers %}
-            <li class="list-group-item">
-              {{ engineer.first_name }} {{ engineer.last_name }}
-              <span class="text-muted small">({{ engineer.email }})</span>
-            </li>
+            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#mechanicalEngineerModal{{ engineer.id }}">
+              <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+              <div class="card-body text-center">
+                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
+              </div>
+            </div>
+            <!-- Engineer Modal -->
+            <div class="modal fade" id="mechanicalEngineerModal{{ engineer.id }}" tabindex="-1" aria-labelledby="mechanicalEngineerModalLabel{{ engineer.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="mechanicalEngineerModalLabel{{ engineer.id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="img-fluid rounded mb-3" alt="Engineer Photo">
+                    <p><strong>Email:</strong> {{ engineer.user.email }}</p>
+                    <p><strong>Specialty:</strong> {{ engineer.specialty|default:'Mechanical Engineering' }}</p>
+                    <form method="post" action="/book-session/" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="sessionDateMech{{ engineer.id }}" class="form-label">Book a Session</label>
+                        <input type="datetime-local" class="form-control" id="sessionDateMech{{ engineer.id }}" name="session_date" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="customerFilesMech{{ engineer.id }}" class="form-label">Upload Files/Images</label>
+                        <input type="file" class="form-control" id="customerFilesMech{{ engineer.id }}" name="customer_files" multiple>
+                      </div>
+                      <input type="hidden" name="engineer_id" value="{{ engineer.id }}">
+                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
             {% empty %}
-            <li class="list-group-item text-muted">No mechanical engineers available.</li>
+            <div class="text-muted">No mechanical engineers available.</div>
             {% endfor %}
-          </ul>
+          </div>
+          <script>document.getElementById('mechanical-carousel').dataset.startIdx = 0;</script>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('mechanical-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Interior Design</h5>
-          <ul class="list-group list-group-flush">
+    <!-- Interior Design Field -->
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Interior Design</h5>
+        <div class="position-relative">
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('interior-carousel', -1)">&lt;</button>
+          <div id="interior-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in interior_engineers %}
-            <li class="list-group-item">
-              {{ engineer.first_name }} {{ engineer.last_name }}
-              <span class="text-muted small">({{ engineer.email }})</span>
-            </li>
+            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#interiorEngineerModal{{ engineer.id }}">
+              <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+              <div class="card-body text-center">
+                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
+              </div>
+            </div>
+            <!-- Engineer Modal -->
+            <div class="modal fade" id="interiorEngineerModal{{ engineer.id }}" tabindex="-1" aria-labelledby="interiorEngineerModalLabel{{ engineer.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="interiorEngineerModalLabel{{ engineer.id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <img src="{{ engineer.image_url|default:'/static/images/default-engineer.png' }}" class="img-fluid rounded mb-3" alt="Engineer Photo">
+                    <p><strong>Email:</strong> {{ engineer.user.email }}</p>
+                    <p><strong>Specialty:</strong> {{ engineer.specialty|default:'Interior Design' }}</p>
+                    <form method="post" action="/book-session/" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="sessionDateInt{{ engineer.id }}" class="form-label">Book a Session</label>
+                        <input type="datetime-local" class="form-control" id="sessionDateInt{{ engineer.id }}" name="session_date" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="customerFilesInt{{ engineer.id }}" class="form-label">Upload Files/Images</label>
+                        <input type="file" class="form-control" id="customerFilesInt{{ engineer.id }}" name="customer_files" multiple>
+                      </div>
+                      <input type="hidden" name="engineer_id" value="{{ engineer.id }}">
+                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
             {% empty %}
-            <li class="list-group-item text-muted">No interior design engineers available.</li>
+            <div class="text-muted">No interior design engineers available.</div>
             {% endfor %}
-          </ul>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('interior-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
