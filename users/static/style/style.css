@@ -33,3 +33,45 @@
   background-image: url('/static/img/building.jpg');
   background-color: #ffc107;
 }
+/* Engineer Card Standard Square Size */
+.engineer-card {
+  width: 220px !important;
+  height: 220px !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.engineer-card:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+.engineer-card .card-img-top {
+  height: 120px;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+}
+.engineer-card .card-body {
+  padding: 0.5rem;
+}
+/* Slider Button Style */
+.slider-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #333;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.slider-btn:hover {
+  background: #e2e6ea;
+  color: #007bff;
+}

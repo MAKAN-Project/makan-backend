@@ -36,6 +36,8 @@ def engineering_fields(request, stage):
     elif stage == 'decorate':
         context['interior_engineers'] = Engineer.objects.filter(education__icontains='interior')
         return render(request, 'engineering_fields_decorate.html', context)
+    elif stage == '3d_furniture':
+        return render(request, 'engineering_fields_3d_furniture.html', context)
     else:
         context['architecture_engineers'] = []
         context['civil_engineers'] = []
@@ -231,6 +233,7 @@ def customer_dashboard(request):
 
     context = {
         'user': user,
+        'engineer': Engineer.objects.all(),
         'recent_ai_requests': ai_requests[:5],
         'upcoming_sessions': upcoming_sessions,
         'total_requests': ai_requests.count(),
