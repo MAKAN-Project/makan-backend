@@ -21,6 +21,12 @@ class Engineer(models.Model):
         ("approved", "Approved"),
         ("rejected", "Rejected"),
     ]
+    SPECIALIZATION_CHOICES = [
+        ("architecture", "Architecture"),
+        ("interior", "Interior Design"),
+        ("civil", "Civil Engineering"),
+        ("mechanical", "Mechanical Engineering"),
+    ]
 
     eng_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="engineer_profile")
@@ -28,7 +34,11 @@ class Engineer(models.Model):
     education = models.CharField(max_length=255)
     certifications = models.CharField(max_length=255, blank=True, null=True)
     licenses = models.CharField(max_length=255, blank=True, null=True)
-
+    specialization = models.CharField(
+        max_length=50,
+        choices=SPECIALIZATION_CHOICES,
+        default="architecture"
+    )
     profile_photo = models.ImageField(
         upload_to="engineers/photos/",
         blank=True,

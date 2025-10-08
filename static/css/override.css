@@ -1,0 +1,195 @@
+/* Small overrides to enforce the MAKAN palette and neutralize external theme overrides */
+:root {
+  --makan-primary: #0F2C4D; /* navy */
+  --makan-accent:  #D6AE32; /* mustard */
+  --makan-info:    #5DAFEF; /* sky */
+}
+
+/* Force navbar to our navy palette (override theme gradients) */
+#mainNavbar.navbar,
+.navbar {
+  background: linear-gradient(180deg, var(--makan-primary), #08243a) !important;
+  color: white !important;
+  box-shadow: 0 6px 18px rgba(15,44,77,0.12) !important;
+}
+#mainNavbar .nav-link,
+#mainNavbar .navbar-brand,
+.navbar .nav-link,
+.navbar .navbar-brand {
+  color: rgba(255,255,255,0.95) !important;
+}
+
+/* Sidebar: ensure dark subtle background, remove bright accents */
+.sidebar {
+  background: linear-gradient(180deg, rgba(15,44,77,0.03), rgba(9,24,42,0.04)) !important;
+  border-right: 1px solid rgba(0,0,0,0.06) !important;
+  color: rgba(255,255,255,0.9) !important;
+}
+.sidebar .nav-link { color: rgba(255,255,255,0.85) !important; }
+
+/* Prevent accidental bright outlines or borders originating from theme CSS */
+.container, .container-fluid, .row, main {
+  outline: none !important;
+  border-left: none !important;
+}
+
+/* Ensure logo sizing and fallback display */
+#siteLogo { height: 50px; width: auto; display: inline-block; }
+#siteLogo[alt] { background: transparent; }
+
+/* Small safety: make sure our footer stays consistent */
+.site-footer { background: linear-gradient(180deg, var(--makan-primary), #091726) !important; }
+
+/* Keep important link colors in header */
+a.nav-link { color: rgba(255,255,255,0.95) !important; }
+
+/* Keep buttons in navbar readable */
+#mainNavbar .btn-light { background: rgba(255,255,255,0.95) !important; color: var(--makan-primary) !important; }
+
+/* Narrow scope, avoid touching other components */
+
+/* End of override.css */
+/* ===== FOOTER DESIGN ===== */
+footer.site-footer {
+  background: linear-gradient(to bottom, #0d253f 0%, #081522 100%);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 70px 0 35px;
+  font-size: 0.95rem;
+  font-family: "Poppins", sans-serif;
+  border: none;
+}
+
+/* ===== Brand Title ===== */
+.footer-brand {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  display: inline-block;
+  border-bottom: 3px solid #d4af37;
+  padding-bottom: 6px;
+  margin-bottom: 18px;
+  transition: color 0.3s ease;
+}
+
+.footer-brand:hover {
+  color: #d4af37;
+}
+
+/* ===== Headings ===== */
+.site-footer h5 {
+  color: #d4af37;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Paragraph Text ===== */
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.96rem;
+  line-height: 1.8;
+  max-width: 380px;
+}
+
+/* ===== Links ===== */
+.site-footer a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.site-footer a:hover {
+  color: #d4af37;
+  text-decoration: underline;
+  transform: translateY(-2px);
+}
+
+/* ===== Quick Links Section ===== */
+.quick-links a {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+/* ===== Social Icons ===== */
+.social-icons a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+  background: #d4af37;
+  color: #0d253f;
+  transform: translateY(-3px);
+}
+
+/* ===== Footer Bottom ===== */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 50px;
+  padding-top: 25px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-top: none;
+}
+
+.footer-bottom span {
+  color: #d4af37;
+  font-weight: 600;
+}
+/* ===== Quick Links Elegant Style ===== */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  padding-left: 18px;
+  display: inline-block;
+  font-size: 0.96rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.footer-links a::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d4af37;
+  font-weight: bold;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #d4af37;
+  transform: translateX(5px);
+}
+
+.footer-links a:hover::before {
+  color: #fff;
+  transform: translateY(-50%) translateX(5px);
+}
