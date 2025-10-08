@@ -19,11 +19,13 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path,include
+from . import views
 
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
-    path('admin/', admin.site.urls),                # لوحة الإدارة
+    path('admin/', admin.site.urls),  
+    path('', views.home, name='home'),              # لوحة الإدارة
     path('sessions/', include('sessions_app.urls')), # كل روابط جلساتك
     path('users/', include('users.urls')),          # روابط users
     path('requests/', include('airequests.urls')),  # روابط airequests

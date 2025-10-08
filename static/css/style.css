@@ -1,43 +1,297 @@
-/* Dark sidebar with glowing scroll */
+/* Site color palette variables (MAKAN) */
+:root {
+  --makan-primary: #0F2C4D; /* navy */
+  --makan-accent:  #D6AE32; /* mustard */
+  --makan-info:    #5DAFEF; /* sky */
+  --makan-bg:      #F4F4F4;
+  --makan-text:    #0A1B2E;
+}
+
+/* Alias older/bootstrap variable names used in home_style.css so both files share same palette */
+:root {
+  --bs-primary: var(--makan-primary);
+  --bs-secondary: var(--makan-accent);
+  --bs-info: var(--makan-info);
+  --bs-light: var(--makan-bg);
+  --bs-dark: var(--makan-text);
+}
+
+/* Dark sidebar with subtle border */
 .sidebar {
-    background:#343a40;
-    overflow-y: auto !important;
-    max-height: 100vh !important;
-    border-right: 2px solid #0ff;
+  background:#343a40;
+  overflow-y: auto !important;
+  max-height: 100vh !important;
+  border-right: 2px solid rgba(255,255,255,0.03);
 }
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.08); border-radius: 4px; }
 
-.sidebar::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background-color: #0ff; 
-    border-radius: 4px;
-    box-shadow: 0 0 5px #0ff;
-}
-
+/* Navbar base styles — site-wide
+   - Use CSS variables and sensible defaults.
+   - Allow page-specific overrides (e.g., home) by avoiding heavy !important usage.
+*/
 .navbar {
-    background: linear-gradient(90deg, #0ff, #06f);
-    color: white !important;
+  background: var(--makan-primary);
+  color: white;
+  transition: background-color 220ms ease, box-shadow 220ms ease, padding 220ms ease;
+  
+}
+.navbar .nav-link { color: rgba(255,255,255,0.95); transition: color 180ms ease; }
+.navbar .nav-link:hover { color: var(--makan-accent); }
+.navbar-brand { font-weight: 700; letter-spacing: 1px; color: var(--makan-accent); }
+
+/* Buttons in navbar (notifications/user) should be light on dark background */
+.navbar .btn-light { background: rgba(255,255,255,0.95); color: var(--makan-primary); }
+.navbar .btn-light i { color: var(--makan-primary); }
+
+/* When the page requests a transparent navbar (e.g., homepage over hero) */
+.navbar.transparent {
+  background: linear-gradient(180deg, rgba(15,44,77,0.12), rgba(15,44,77,0.06));
+  box-shadow: none;
+  color: white;
 }
 
-.navbar-brand {
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-shadow: 0 0 5px #0ff;
+/* Scrolled state: compact and solid */
+.navbar.scrolled {
+  background: var(--makan-primary);
+  box-shadow: 0 6px 18px rgba(15,44,77,0.12);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
-.jazzmin-welcome {
-    font-size: 1.4em;
-    color: #0ff;
-    text-shadow: 0 0 8px #0ff, 0 0 15px #06f;
+/* Ensure contrasting icon/link colors when navbar is transparent (white icons)
+   and darker icons when scrolled/solid. */
+.navbar.transparent .nav-link,
+.navbar.transparent .navbar-brand { color: rgba(255,255,255,0.95); }
+.navbar.scrolled .nav-link,
+.navbar.scrolled .navbar-brand { color: rgba(255,255,255,0.98); }
+
+/* ===== Global component styles aligned with home palette ===== */
+
+/* Primary buttons */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:hover { 
+  background: linear-gradient(90deg, var(--makan-info), var(--makan-accent));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 6px 18px rgba(13,34,60,0.08);
 }
 
-a.nav-link {
-    color: #fff !important;
+/* Secondary / outline */
+.btn-outline-primary {
+  color: var(--makan-primary);
+  border-color: rgba(15,44,77,0.12);
 }
 
-a.nav-link:hover {
-    color: #0ff !important;
-    text-shadow: 0 0 5px #0ff;
+/* Cards */
+.card {
+  border-radius: 12px;
+  border: 1px solid rgba(15,44,77,0.06);
+  box-shadow: 0 6px 16px rgba(13,34,60,0.04);
+}
+
+/* Links */
+a { color: var(--makan-primary); }
+a:hover { color: var(--makan-accent); text-decoration: none; }
+
+/* Badges */
+.badge-makan { background: var(--makan-accent); color: #07203a; font-weight: 600; }
+
+/* Form controls */
+.form-control:focus { border-color: var(--makan-info); box-shadow: 0 0 0 0.2rem rgba(93,175,239,0.12); }
+
+/* Inputs and search */
+.input-group .form-control { border-radius: 8px; }
+
+/* Sidebar accents */
+.sidebar { background: linear-gradient(180deg, rgba(15,44,77,0.03), rgba(93,175,239,0.02)); }
+.sidebar .nav-link { color: rgba(255,255,255,0.85); }
+
+/* Footer tweaks to match palette */
+footer.bg-dark { background-color: var(--makan-primary); }
+footer a { color: rgba(255,255,255,0.9); }
+
+/* Utility: small helpers */
+.text-makan { color: var(--makan-primary) !important; }
+.bg-makan { background: var(--makan-primary) !important; color: white; }
+
+/* Footer styles matching Home palette */
+.site-footer { background: linear-gradient(180deg, rgba(15,44,77,1), rgba(9,24,42,1)); color: rgba(255,255,255,0.95); }
+.site-footer .footer-top { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.site-footer .h5, .site-footer h5, .site-footer h6 { color: #fff; }
+.site-footer .text-muted { color: rgba(255,255,255,0.7); }
+.site-footer .footer-link { color: rgba(255,255,255,0.9); text-decoration: none; }
+.site-footer .footer-link:hover { color: var(--makan-accent); text-decoration: underline; }
+.site-footer .footer-sublink { color: rgba(255,255,255,0.75); }
+.site-footer .footer-sublink:hover { color: var(--makan-info); }
+
+.site-footer .newsletter-form .form-control { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.95); }
+.site-footer .newsletter-form .form-control::placeholder { color: rgba(255,255,255,0.6); }
+.site-footer .newsletter-form .btn-primary { background: linear-gradient(90deg, var(--makan-info), var(--makan-accent)); border: none; }
+.site-footer .btn-outline-light { color: rgba(255,255,255,0.95); border-color: rgba(255,255,255,0.12); }
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .site-footer .footer-bottom { text-align: center; }
+  .site-footer .footer-bottom .container { gap: 0.5rem; }
+}
+
+/* Small helpers */
+.footer-top .small { color: rgba(255,255,255,0.75); }
+
+
+/* Jazzmin admin tweaks (soften) */
+.jazzmin-welcome { font-size: 1.2em; color: var(--makan-accent); }
+
+/* Footer adjustments if base uses bg-dark */
+footer.bg-dark { background-color: var(--makan-primary) !important; }
+footer .text-primary { color: var(--makan-accent) !important; }
+
+/* Utility: link colors */
+a.nav-link { color: rgba(255,255,255,0.92) !important; }
+
+
+footer.site-footer {
+  background: linear-gradient(to bottom, #0d253f 0%, #081522 100%);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 70px 0 35px;
+  font-size: 0.95rem;
+  font-family: "Poppins", sans-serif;
+  border: none;
+}
+
+/* ===== Brand Title ===== */
+.footer-brand {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  display: inline-block;
+  border-bottom: 3px solid #d4af37;
+  padding-bottom: 6px;
+  margin-bottom: 18px;
+  transition: color 0.3s ease;
+}
+
+.footer-brand:hover {
+  color: #d4af37;
+}
+
+/* ===== Headings ===== */
+.site-footer h5 {
+  color: #d4af37;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Paragraph Text ===== */
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.96rem;
+  line-height: 1.8;
+  max-width: 380px;
+}
+
+/* ===== Links ===== */
+.site-footer a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.site-footer a:hover {
+  color: #d4af37;
+  text-decoration: underline;
+  transform: translateY(-2px);
+}
+
+/* ===== Quick Links Section ===== */
+.quick-links a {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+/* ===== Social Icons ===== */
+.social-icons a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+  background: #d4af37;
+  color: #0d253f;
+  transform: translateY(-3px);
+}
+
+/* ===== Footer Bottom ===== */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 50px;
+  padding-top: 25px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-top: none;
+}
+
+.footer-bottom span {
+  color: #d4af37;
+  font-weight: 600;
+}
+/* ===== Quick Links Elegant Style ===== */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  padding-left: 18px;
+  display: inline-block;
+  font-size: 0.96rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.footer-links a::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d4af37;
+  font-weight: bold;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #d4af37;
+  transform: translateX(5px);
+}
+
+.footer-links a:hover::before {
+  color: #fff;
+  transform: translateY(-50%) translateX(5px);
 }
