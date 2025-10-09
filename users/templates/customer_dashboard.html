@@ -33,6 +33,21 @@
             </a>
         </div>
       </div>
+
+      <!-- Notifications -->
+{% if notifications %}
+  <div class="alert alert-info">
+    <h5>Notifications</h5>
+    <ul class="mb-0">
+      {% for note in notifications %}
+        <li>
+          {{ note.message }} <small class="text-muted">({{ note.created_at|timesince }} ago)</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
         {% load static %}
         <link rel="stylesheet" href="{% static 'style/style.css' %}">
 

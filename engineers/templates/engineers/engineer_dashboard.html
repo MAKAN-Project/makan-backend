@@ -110,40 +110,47 @@ body {
             </thead>
             <tbody>
               {% for req in active_project_requests %}
-              <tr>
-                <td>{{ req.client.first_name }} {{ req.client.last_name }}</td>
-                <td>{{ req.description }}</td>
-                <td>
-                  {% if req.status == "pending" %}
-                    <span class="badge bg-info text-dark">Pending</span>
-                  {% elif req.status == "in_progress" %}
-                    <span class="badge bg-warning text-dark">In Progress</span>
-                  {% elif req.status == "rejected" %}
-                    <span class="badge bg-danger text-white">Rejected</span>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if req.file %}
-                    <a href="{{ req.file.path }}" target="_blank">{{ req.file.file_name }}</a>
-                  {% else %}
-                    N/A
-                  {% endif %}
-                </td>
-                <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-                <td>
-                  {% if req.status == "pending" %}
-                    <a href="{% url 'accept_project_request' req.request_id %}" class="btn btn-success btn-sm">Accept</a>
-                    <a href="{% url 'reject_project_request' req.request_id %}" class="btn btn-danger btn-sm">Reject</a>
-                  {% else %}
-                    <span class="text-muted">No actions</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="6" class="text-center text-muted">No active project requests</td>
-              </tr>
-              {% endfor %}
+  <tr>
+    <td>{{ req.client.first_name }} {{ req.client.last_name }}</td>
+    <td>{{ req.description }}</td>
+    <td>
+      {% if req.status == "pending" %}
+        <span class="badge bg-info text-dark">Pending</span>
+      {% elif req.status == "in_progress" %}
+        <span class="badge bg-warning text-dark">In Progress</span>
+      {% elif req.status == "rejected" %}
+        <span class="badge bg-danger text-white">Rejected</span>
+      {% endif %}
+    </td>
+    <td>
+      {% if req.file %}
+        <a href="{{ req.file.file.url }}" target="_blank">{{ req.file.file_name }}</a>
+      {% else %}
+        N/A
+      {% endif %}
+    </td>
+    <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+    <td>
+      {% if req.status == "pending" %}
+        <form method="POST" action="{% url 'accept_project_request' req.request_id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm">Accept</button>
+        </form>
+        <form method="POST" action="{% url 'reject_project_request' req.request_id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+        </form>
+      {% else %}
+        <span class="text-muted">No actions</span>
+      {% endif %}
+    </td>
+  </tr>
+{% empty %}
+  <tr>
+    <td colspan="6" class="text-center text-muted">No active project requests</td>
+  </tr>
+{% endfor %}
+
             </tbody>
           </table>
         </div>
