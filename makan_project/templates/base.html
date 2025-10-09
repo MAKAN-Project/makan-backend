@@ -44,38 +44,52 @@
         <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
 
         <!-- Notifications -->
-        <li class="nav-item dropdown ms-lg-3">
-          <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-bell fs-5"></i>
-            {% if pending_notifications %}
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
-                {{ pending_notifications|length }}
-              </span>
-            {% endif %}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
-            {% if pending_notifications %}
-              {% for notif in pending_notifications %}
-                <li class="p-3 border-bottom d-flex justify-content-between align-items-start">
-                  <div>
-                    <div class="fw-semibold">{{ notif.client.first_name }} {{ notif.client.last_name }}</div>
-                    <small class="text-muted">{{ notif.created_at|date:"Y-m-d H:i" }}</small>
-                  </div>
-                  <button class="btn btn-sm btn-outline-primary view-request-btn"
-                    data-bs-toggle="modal" data-bs-target="#requestModal"
-                    data-request-id="{{ notif.request_id }}"
-                    data-description="{{ notif.description }}"
-                    data-client="{{ notif.client.first_name }} {{ notif.client.last_name }}"
-                    {% if notif.file %} data-file-url="/media/{{ notif.file.path }}" data-file-name="{{ notif.file.file_name }}" {% endif %}>
-                    View
-                  </button>
-                </li>
-              {% endfor %}
+        <!-- Notifications -->
+<li class="nav-item dropdown ms-lg-3">
+  <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-bell fs-5"></i>
+    {% if pending_notifications %}
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+        {{ pending_notifications|length }}
+      </span>
+    {% endif %}
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
+    {% if pending_notifications %}
+      {% for notif in pending_notifications %}
+        <li class="p-3 border-bottom d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-semibold">
+              {% if notif.sender %}
+                {{ notif.sender.first_name }} {{ notif.sender.last_name }}
+              {% else %}
+                {{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}
+              {% endif %}
+            </div>
+            <small class="text-muted">{{ notif.created_at|date:"Y-m-d H:i" }}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-primary view-request-btn"
+            data-bs-toggle="modal" data-bs-target="#requestModal"
+            data-request-id="{{ notif.project_request.request_id }}"
+            data-description="{{ notif.project_request.description }}"
+            {% if notif.sender %}
+              data-sender="{{ notif.sender.first_name }} {{ notif.sender.last_name }}"
             {% else %}
-              <li class="p-3 text-center text-muted">No new notifications</li>
+              data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
             {% endif %}
-          </ul>
+            {% if notif.project_request.file %}
+              data-file-url="{{ notif.project_request.file.file.url }}"
+              data-file-name="{{ notif.project_request.file.file_name }}"
+            {% endif %}>
+            View
+          </button>
         </li>
+      {% endfor %}
+    {% else %}
+      <li class="p-3 text-center text-muted">No new notifications</li>
+    {% endif %}
+  </ul>
+</li>
 
         <!-- User Dropdown -->
         <li class="nav-item dropdown ms-lg-3">
@@ -139,8 +153,6 @@
 </div>
 
 <!-- ===== FOOTER ===== -->
-<!-- ===== FOOTER ===== -->
-
 <footer class="site-footer">
   <div class="container py-5">
     <div class="row gy-4">
