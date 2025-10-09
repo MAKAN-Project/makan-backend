@@ -7,6 +7,8 @@ from files.models import File
 from users.models import User
 from .forms import EngineerProfileForm
 from engineers.models import Engineer
+from notifications.models import Notification
+
 
 def dashboard(request):
     user_id = request.session.get('user_id')
@@ -105,23 +107,48 @@ def engineer_complete_profile(request):
 # ==========================
 # تحديث حالة طلب المشروع
 # ==========================
+# def accept_project_request(request, request_id):
+#     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
+
+#     if request.method == "POST":
+#         # استلام وقت الجلسة من الفورم
+#         scheduled_time = request.POST.get("scheduled_at")
+
+#         # تحقق من وجود الوقت
+#         if not scheduled_time:
+#             messages.error(request, "Please select a session date and time.")
+#             return redirect('engineers_dashboard')
+
+#         # تحديث حالة الطلب
+#         project_request.status = 'in_progress'
+#         project_request.save()
+
+#         # إنشاء جلسة جديدة
+#         Session.objects.create(
+#             eng=project_request.engineer,
+#             user=project_request.client,
+#             scheduled_at=scheduled_time,
+#             status='scheduled'
+#         )
+
+#         messages.success(request, f"Request #{project_request.request_id} accepted and session scheduled.")
+#         return redirect('engineers_dashboard')
+#     # إذا ما كان POST، نعرض المودال أو صفحة التأكيد
+#     return render(request, "engineers/schedule_session.html", {"project_request": project_request})
+
+
+
+
 def accept_project_request(request, request_id):
     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
 
     if request.method == "POST":
-        # استلام وقت الجلسة من الفورم
-        scheduled_time = request.POST.get("scheduled_at")
+        # TEMP: schedule tomorrow by default
+        scheduled_time = timezone.now() + timezone.timedelta(days=1)
 
-        # تحقق من وجود الوقت
-        if not scheduled_time:
-            messages.error(request, "Please select a session date and time.")
-            return redirect('engineers_dashboard')
-
-        # تحديث حالة الطلب
         project_request.status = 'in_progress'
         project_request.save()
 
-        # إنشاء جلسة جديدة
         Session.objects.create(
             eng=project_request.engineer,
             user=project_request.client,
@@ -129,11 +156,65 @@ def accept_project_request(request, request_id):
             status='scheduled'
         )
 
-        messages.success(request, f"Request #{project_request.request_id} accepted and session scheduled.")
+        print("Engineer:", project_request.engineer.user)
+        print("Client:", project_request.client)
+
+        notif = Notification.objects.create(
+        sender=project_request.engineer.user,
+        recipient=project_request.client,
+        project_request=project_request,
+        type='accepted',
+        message=f"Your project request #{project_request.request_id} has been accepted by {project_request.engineer.user.first_name}.",
+        created_at=timezone.now()
+        )
+        print("Notification created:", notif.id, notif.recipient, notif.message)
+
+
+        messages.success(request, f"Request #{project_request.request_id} accepted and notification sent.")
         return redirect('engineers_dashboard')
 
-    # إذا ما كان POST، نعرض المودال أو صفحة التأكيد
-    return render(request, "engineers/schedule_session.html", {"project_request": project_request})
+    return redirect('engineers_dashboard')
+
+
+# def accept_project_request(request, request_id):
+#     # Get the project request
+#     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
+
+#     # Only handle POST requests
+#     if request.method == "POST":
+#         scheduled_time = request.POST.get("scheduled_at")
+
+#         if not scheduled_time:
+#             messages.error(request, "Please select a session date and time.")
+#             return redirect('engineers_dashboard')
+
+#         # Update request status
+#         project_request.status = 'in_progress'
+#         project_request.save()
+
+#         # Create session for this project
+#         Session.objects.create(
+#             eng=project_request.engineer,
+#             user=project_request.client,
+#             scheduled_at=scheduled_time,
+#             status='scheduled'
+#         )
+
+#         # ✅ Create a notification for the client
+#         Notification.objects.create(
+#             sender=project_request.engineer.user,          # the engineer (User)
+#             recipient=project_request.client,              # the client (User)
+#             project_request=project_request,
+#             type='accepted',
+#             message=f"Your project request #{project_request.request_id} has been accepted by {project_request.engineer.user.first_name}.",
+#             created_at=timezone.now()
+#         )
+
+#         messages.success(request, f"Request #{project_request.request_id} accepted and notification sent.")
+#         return redirect('engineers_dashboard')
+
+#     return redirect('engineers_dashboard')
+
 
 def reject_project_request(request, request_id):
     project_request = get_object_or_404(ProjectRequest, request_id=request_id)

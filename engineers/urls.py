@@ -11,7 +11,9 @@ urlpatterns = [
 
     # تحديث حالة طلب مشروع
 
-    path('project_request/<int:request_id>/accept/', views.accept_project_request, name='accept_project_request'),
+    # path('project_request/<int:request_id>/accept/', views.accept_project_request, name='accept_project_request'),
+    path('accept_project_request/<int:request_id>/', views.accept_project_request, name='accept_project_request'),
+
     path('project_request/<int:request_id>/reject/', views.reject_project_request, name='reject_project_request'),
 
 ]

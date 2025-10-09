@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Engineer Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-4 text-center p-3">
+                <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded" alt="Engineer Photo">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h2>
+                    <p><strong>Email:</strong> {{ engineer.user.email }}</p>
+                    <p><strong>Education:</strong> {{ engineer.education }}</p>
+                    <p><strong>Specialization:</strong> {{ engineer.specialization|title }}</p>
+                    <p><strong>Status:</strong> {{ engineer.status|title }}</p>
+                    <p><strong>Bio / Description:</strong></p>
+                    <p>{{ engineer.bio|default:"No bio provided." }}</p>
+
+                    <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

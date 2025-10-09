@@ -43,6 +43,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'jazzmin',
+    'notifications',
     'projectrequests',
     'sessions_app',
     'users',
