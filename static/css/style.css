@@ -1,4 +1,7 @@
+
+/*
 /* Site color palette variables (MAKAN) */
+
 :root {
   --makan-primary: #0F2C4D; /* navy */
   --makan-accent:  #D6AE32; /* mustard */
@@ -6,7 +9,7 @@
   --makan-bg:      #F4F4F4;
   --makan-text:    #0A1B2E;
 }
-
+*/
 /* Alias older/bootstrap variable names used in home_style.css so both files share same palette */
 :root {
   --bs-primary: var(--makan-primary);
@@ -106,7 +109,7 @@ a:hover { color: var(--makan-accent); text-decoration: none; }
 
 /* Sidebar accents */
 .sidebar { background: linear-gradient(180deg, rgba(15,44,77,0.03), rgba(93,175,239,0.02)); }
-.sidebar .nav-link { color: rgba(255,255,255,0.85); }
+.sidebar .nav-link { color: rgba(8, 8, 8, 0.85); }
 
 /* Footer tweaks to match palette */
 footer.bg-dark { background-color: var(--makan-primary); }
