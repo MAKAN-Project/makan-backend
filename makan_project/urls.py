@@ -34,6 +34,7 @@ urlpatterns = [
     path('files/', include('files.urls')),          # روابط files
     path('models3d/', include('models3d.urls')),    # روابط models3d
     path('payments/', include('payments.urls')),    # روابط payments
+    path('notifications/', include('notifications.urls')),
 
 ]
 if settings.DEBUG:

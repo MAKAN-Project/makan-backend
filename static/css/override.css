@@ -23,9 +23,9 @@
 .sidebar {
   background: linear-gradient(180deg, rgba(15,44,77,0.03), rgba(9,24,42,0.04)) !important;
   border-right: 1px solid rgba(0,0,0,0.06) !important;
-  color: rgba(255,255,255,0.9) !important;
+  color: rgba(0, 0, 0, 0.9) !important;
 }
-.sidebar .nav-link { color: rgba(255,255,255,0.85) !important; }
+.sidebar .nav-link { color: rgba(0, 0, 0, 0.85) !important; }
 
 /* Prevent accidental bright outlines or borders originating from theme CSS */
 .container, .container-fluid, .row, main {
@@ -41,7 +41,7 @@
 .site-footer { background: linear-gradient(180deg, var(--makan-primary), #091726) !important; }
 
 /* Keep important link colors in header */
-a.nav-link { color: rgba(255,255,255,0.95) !important; }
+a.nav-link { color: rgba(0, 0, 0, 0.95) !important; }
 
 /* Keep buttons in navbar readable */
 #mainNavbar .btn-light { background: rgba(255,255,255,0.95) !important; color: var(--makan-primary) !important; }

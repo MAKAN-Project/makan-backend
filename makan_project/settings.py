@@ -1,6 +1,7 @@
 
 import os
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -59,6 +60,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    
 ]
 
 
@@ -84,6 +87,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.notifications_context',
             ],
         },
     },
@@ -96,8 +100,10 @@ WSGI_APPLICATION = 'makan_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-
-
+ZOOM_ACCOUNT_ID = "2g0_yCiTTZysfH_Aza6HZw"
+ZOOM_CLIENT_ID = "baFfAOAHR_Cp_h0m8rfcDw"
+ZOOM_CLIENT_SECRET = "Ee1HtbHpkir3m0E6D4zIe1RsJD3tWbKE"
+ZOOM_BASE_URL = "https://api.zoom.us/v2"
 
 DATABASES = {
     'default': {
@@ -199,3 +205,12 @@ JAZZMIN_UI_TWEAKS = {
     "body_small_text": False,
 }
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'error',
+}
