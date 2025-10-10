@@ -8,8 +8,9 @@ from users.models import User
 from .forms import EngineerProfileForm
 from engineers.models import Engineer
 from notifications.models import Notification
-
-
+from utils.zoom_api import create_zoom_meeting
+from django.utils.dateparse import parse_datetime
+from .models import EngineerAvailability
 def dashboard(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -53,15 +54,16 @@ def dashboard(request):
     pending_requests_count = project_requests.filter(status='pending').count()
     active_project_requests_count = project_requests.count()
     completed_projects_count = File.objects.filter(user=user, status='completed').count()
-    pending_notifications = ProjectRequest.objects.filter(
-    engineer=engineer,
-    status='pending').order_by('-created_at')[:5]
+    notifications = Notification.objects.filter(
+    recipient=user
+        ).order_by('-created_at')[:10]
     context = {
         'active_project_requests': project_requests,
         'sessions': sessions,
         'pending_requests_count': pending_requests_count,
         'active_project_requests_count': active_project_requests_count,
-        'completed_projects_count': completed_projects_count,'pending_notifications': pending_notifications
+        'completed_projects_count': completed_projects_count,
+        'notifications': notifications
     }
 
     return render(request, 'engineers/engineer_dashboard.html', context)
@@ -104,122 +106,202 @@ def engineer_complete_profile(request):
     return render(request, "engineers/engineer_complete_profile.html", {"form": form})
 
 
-# ==========================
-# تحديث حالة طلب المشروع
-# ==========================
-# def accept_project_request(request, request_id):
-#     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
-
-#     if request.method == "POST":
-#         # استلام وقت الجلسة من الفورم
-#         scheduled_time = request.POST.get("scheduled_at")
-
-#         # تحقق من وجود الوقت
-#         if not scheduled_time:
-#             messages.error(request, "Please select a session date and time.")
-#             return redirect('engineers_dashboard')
-
-#         # تحديث حالة الطلب
-#         project_request.status = 'in_progress'
-#         project_request.save()
-
-#         # إنشاء جلسة جديدة
-#         Session.objects.create(
-#             eng=project_request.engineer,
-#             user=project_request.client,
-#             scheduled_at=scheduled_time,
-#             status='scheduled'
-#         )
-
-#         messages.success(request, f"Request #{project_request.request_id} accepted and session scheduled.")
-#         return redirect('engineers_dashboard')
-#     # إذا ما كان POST، نعرض المودال أو صفحة التأكيد
-#     return render(request, "engineers/schedule_session.html", {"project_request": project_request})
-
-
 
 
 def accept_project_request(request, request_id):
     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
 
     if request.method == "POST":
-        # TEMP: schedule tomorrow by default
-        scheduled_time = timezone.now() + timezone.timedelta(days=1)
+        scheduled_time_str = request.POST.get("scheduled_at")
+        scheduled_time = parse_datetime(scheduled_time_str)
+        if not scheduled_time:
+            messages.error(request, "Please provide a valid date and time.")
+            return redirect("engineers_dashboard")
 
+        # تحديث حالة الطلب
         project_request.status = 'in_progress'
         project_request.save()
 
-        Session.objects.create(
+        # ✅ إنشاء اجتماع Zoom فعلي
+        meeting = create_zoom_meeting(
+            topic=f"Project Meeting - Request #{project_request.request_id}",
+            start_time=scheduled_time,
+            duration=60,
+            agenda=f"Discussion for project request #{project_request.request_id}"
+        )
+
+        join_link = meeting.get("join_url") if meeting else None
+        host_link = meeting.get("start_url") if meeting else None
+
+        # ✅ إنشاء الجلسة في قاعدة البيانات
+        session = Session.objects.create(
             eng=project_request.engineer,
             user=project_request.client,
             scheduled_at=scheduled_time,
+            meeting_link=join_link,
+            host_link=host_link,
             status='scheduled'
         )
 
-        print("Engineer:", project_request.engineer.user)
-        print("Client:", project_request.client)
+        # ✅ ربط الطلب بالجسلة
+        project_request.session = session
+        project_request.save()
 
-        notif = Notification.objects.create(
-        sender=project_request.engineer.user,
-        recipient=project_request.client,
-        project_request=project_request,
-        type='accepted',
-        message=f"Your project request #{project_request.request_id} has been accepted by {project_request.engineer.user.first_name}.",
-        created_at=timezone.now()
+        # ✅ إشعار العميل بالرابط
+        Notification.objects.create(
+            sender=project_request.engineer.user,
+            recipient=project_request.client,
+            project_request=project_request,
+            type='accepted',
+            message=(
+                f"✅ Your project request #{project_request.request_id} has been accepted!\n\n"
+                f"🕒 Meeting scheduled at: {scheduled_time.strftime('%Y-%m-%d %H:%M')}\n\n"
+                f"🎥 Join your Zoom session here:\n<a href='{join_link}' target='_blank'>{join_link}</a>"
+                if join_link else
+                f"Your project request #{project_request.request_id} has been accepted, "
+                f"but Zoom meeting could not be created."
+            ),
+            created_at=timezone.now()
         )
-        print("Notification created:", notif.id, notif.recipient, notif.message)
 
+        # ✅ إشعار المهندس بالرابط الخاص بالمضيف
+        Notification.objects.create(
+            sender=project_request.engineer.user,
+            recipient=project_request.engineer.user,
+            project_request=project_request,
+            type='zoom_host_link',
+            message=(
+                f"🎯 Zoom meeting created for project #{project_request.request_id}.\n\n"
+                f"Host your session here:\n<a href='{host_link}' target='_blank'>{host_link}</a>"
+                if host_link else
+                f"Zoom meeting created, but no host link was returned."
+            ),
+            created_at=timezone.now()
+        )
 
-        messages.success(request, f"Request #{project_request.request_id} accepted and notification sent.")
+        messages.success(request, f"Request #{project_request.request_id} accepted and Zoom meeting created.")
         return redirect('engineers_dashboard')
 
     return redirect('engineers_dashboard')
 
+def create_zoom_meeting_view(request, session_id):
+    session = get_object_or_404(Session, pk=session_id)
+    if request.method == "POST":
+        zoom_data = create_zoom_meeting(
+            topic=f"Session with {session.user.first_name}",
+            start_time=session.scheduled_at,
+            duration=60
+        )
+        if zoom_data:
+            session.meeting_link = zoom_data.get("join_url")
+            session.host_link = zoom_data.get("start_url")
+            session.status = "scheduled"
+            session.save()
 
-# def accept_project_request(request, request_id):
-#     # Get the project request
-#     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
-
-#     # Only handle POST requests
-#     if request.method == "POST":
-#         scheduled_time = request.POST.get("scheduled_at")
-
-#         if not scheduled_time:
-#             messages.error(request, "Please select a session date and time.")
-#             return redirect('engineers_dashboard')
-
-#         # Update request status
-#         project_request.status = 'in_progress'
-#         project_request.save()
-
-#         # Create session for this project
-#         Session.objects.create(
-#             eng=project_request.engineer,
-#             user=project_request.client,
-#             scheduled_at=scheduled_time,
-#             status='scheduled'
-#         )
-
-#         # ✅ Create a notification for the client
-#         Notification.objects.create(
-#             sender=project_request.engineer.user,          # the engineer (User)
-#             recipient=project_request.client,              # the client (User)
-#             project_request=project_request,
-#             type='accepted',
-#             message=f"Your project request #{project_request.request_id} has been accepted by {project_request.engineer.user.first_name}.",
-#             created_at=timezone.now()
-#         )
-
-#         messages.success(request, f"Request #{project_request.request_id} accepted and notification sent.")
-#         return redirect('engineers_dashboard')
-
-#     return redirect('engineers_dashboard')
-
+            messages.success(request, "✅ Zoom meeting created successfully!")
+        else:
+            messages.error(request, "❌ Failed to create Zoom meeting.")
+    return redirect("engineers_dashboard")
 
 def reject_project_request(request, request_id):
     project_request = get_object_or_404(ProjectRequest, request_id=request_id)
+
     if request.method == "POST":
         project_request.status = 'rejected'
         project_request.save()
-        messages.warning(request, f"Project Request #{project_request.request_id} rejected.")
+
+        # 📨 إرسال إشعار للعميل
+        Notification.objects.create(
+            sender=project_request.engineer.user,  # المهندس الرافض
+            recipient=project_request.client,      # العميل صاحب الطلب
+            project_request=project_request,
+            type='rejected',
+            message=f"Your project request #{project_request.request_id} has been rejected by {project_request.engineer.user.first_name}.",
+            created_at=timezone.now()
+        )
+
+        messages.warning(request, f"Project Request #{project_request.request_id} rejected and client notified.")
+
     return redirect('engineers_dashboard')
+
+
+def approve_reschedule(request, session_id):
+    """المهندس يوافق على إعادة الجدولة"""
+    session = get_object_or_404(Session, id=session_id)
+    
+    # تحديث الحالة إلى approved بعد الموافقة
+    session.status = 'approved'
+    session.save()
+
+    # 📨 إشعار العميل بالموافقة
+    Notification.objects.create(
+        sender=session.eng.user,
+        recipient=session.user,
+        type='reschedule_approved',
+        message=f"تمت الموافقة على إعادة جدولة الجلسة إلى {session.scheduled_at.strftime('%Y-%m-%d %H:%M')}.",
+    )
+
+    messages.success(request, "✅ تمت الموافقة على إعادة الجدولة.")
+    return redirect('engineers_dashboard')
+
+def reject_reschedule(request, session_id):
+    """المهندس يرفض إعادة الجدولة"""
+    session = get_object_or_404(Session, id=session_id)
+    
+    # نعيد الجلسة للحالة السابقة
+    session.status = 'scheduled'
+    session.save()
+
+    # 📨 إشعار العميل بالرفض
+    Notification.objects.create(
+        sender=session.eng.user,
+        recipient=session.user,
+        type='reschedule_rejected',
+        message=f"تم رفض طلب إعادة الجدولة للجلسة المحددة بتاريخ {session.scheduled_at.strftime('%Y-%m-%d %H:%M')}.",
+    )
+
+    messages.warning(request, "❌ تم رفض طلب إعادة الجدولة.")
+    return redirect('engineers_dashboard')
+
+
+def manage_availability(request):
+    """عرض وإضافة المواعيد المتاحة للمهندس"""
+    user_id = request.session.get('user_id')
+    if not user_id:
+        messages.error(request, "You must be logged in.")
+        return redirect('login_register')
+
+    engineer = get_object_or_404(Engineer, user__user_id=user_id)
+
+    if request.method == "POST":
+        date = request.POST.get("date")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+
+        if not date or not start_time or not end_time:
+            messages.error(request, "⚠️ Please fill all fields.")
+        else:
+            # التحقق من عدم تداخل المواعيد
+            exists = EngineerAvailability.objects.filter(
+                engineer=engineer,
+                date=date,
+                start_time=start_time,
+                end_time=end_time
+            ).exists()
+
+            if exists:
+                messages.warning(request, "This time slot already exists.")
+            else:
+                EngineerAvailability.objects.create(
+                    engineer=engineer,
+                    date=date,
+                    start_time=start_time,
+                    end_time=end_time
+                )
+                messages.success(request, "✅ Availability added successfully!")
+
+    availabilities = EngineerAvailability.objects.filter(engineer=engineer).order_by('date', 'start_time')
+
+    return render(request, "engineers/manage_availability.html", {
+        "availabilities": availabilities
+    })

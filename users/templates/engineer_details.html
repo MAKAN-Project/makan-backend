@@ -4,26 +4,291 @@
 {% block title %}Engineer Details{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="card shadow-sm mx-auto" style="max-width: 800px;">
-        <div class="row g-0">
-            <div class="col-md-4 text-center p-3">
-                <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded" alt="Engineer Photo">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h2 class="card-title">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h2>
-                    <p><strong>Email:</strong> {{ engineer.user.email }}</p>
-                    <p><strong>Education:</strong> {{ engineer.education }}</p>
-                    <p><strong>Specialization:</strong> {{ engineer.specialization|title }}</p>
-                    <p><strong>Status:</strong> {{ engineer.status|title }}</p>
-                    <p><strong>Bio / Description:</strong></p>
-                    <p>{{ engineer.bio|default:"No bio provided." }}</p>
+<style>
+  .notification-message a {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+}
 
-                    <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+.notification-message a:hover {
+  text-decoration: underline;
+}
+
+</style>
+<!-- تحميل مكتبة عرض الموديلات ثلاثية الأبعاد -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<style>
+    .project-media img {
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .project-media img:hover {
+        transform: scale(1.05);
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<!-- ===== Engineer Profile Section ===== -->
+<div class="container py-5">
+    <div class="card border-0 shadow-lg mx-auto" style="max-width: 900px; border-radius: 1rem;">
+        <div class="row g-0">
+            <!-- ===== Engineer Photo Section ===== -->
+            <div class="col-md-4 bg-light d-flex flex-column align-items-center justify-content-center p-4 rounded-start">
+                <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}{% static 'images/default-engineer.png' %}{% endif %}"
+                    class="img-fluid rounded-circle shadow-sm mb-3" alt="{{ engineer.user.first_name }}'s photo"
+                    style="width: 160px; height: 160px; object-fit: cover;">
+                <h4 class="mt-2 text-primary fw-semibold">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h4>
+                <p class="text-muted mb-0">{{ engineer.specialization|title }}</p>
+            </div>
+
+            <!-- ===== Engineer Info Section ===== -->
+            <div class="col-md-8">
+                <div class="card-body p-4">
+                    <h3 class="mb-3 fw-bold text-dark">Engineer Information</h3>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><strong>Email:</strong> {{ engineer.user.email }}</li>
+                        {% if engineer.education %}
+                            <li class="mb-2"><strong>Education:</strong> {{ engineer.education }}</li>
+                        {% endif %}
+                        {% if engineer.status %}
+                            <li class="mb-2"><strong>Status:</strong> {{ engineer.status|title }}</li>
+                        {% endif %}
+                    </ul>
+
+                    {% if engineer.bio %}
+                        <div class="mb-4">
+                            <h5 class="fw-semibold">About Engineer</h5>
+                            <p class="text-muted">{{ engineer.bio }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'customer_dashboard' %}" class="btn btn-outline-secondary px-4">← Back</a>
+                        <button type="button" class="btn btn-primary px-4" data-bs-toggle="modal"
+                            data-bs-target="#bookingModal">
+                            Book Consultation
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ===== Booking Modal ===== -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Book Consultation with {{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'reserve_session' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="engineer_id" value="{{ engineer.eng_id }}">
+
+                    <div class="mb-3">
+                        <label for="projectDescription" class="form-label">Project Description</label>
+                        <textarea class="form-control" name="project_description" id="project_description" rows="3"
+                            placeholder="Describe your project..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="projectFiles" class="form-label">Upload Files (Optional)</label>
+                        <input type="file" class="form-control" name="file" id="projectFiles" multiple>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="availableSlot" class="form-label">Available Time Slots</label>
+                        <select name="selected_slot" id="availableSlot" class="form-select" required>
+                            <option value="">-- Select an available slot --</option>
+                            {% for slot in available_slots %}
+                                <option value="{{ slot.id }}">
+                                    {{ slot.date }} | {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                                </option>
+                            {% empty %}
+                                <option disabled>No available slots found</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="consultationNotes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" id="consultationNotes" rows="2"></textarea>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Book Now</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Projects Section ===== -->
+<section class="py-5 bg-light mt-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary">
+                Projects by {{ engineer.user.first_name|default:"Engineer" }} {{ engineer.user.last_name|default:"" }}
+            </h2>
+            <p class="text-muted">Completed and delivered projects handled by this engineer.</p>
+        </div>
+
+        {% if projects %}
+            <div class="row g-4">
+                {% for project in projects %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-shadow">
+                        <div class="project-media bg-light d-flex align-items-center justify-content-center" style="height: 230px; overflow: hidden;">
+                            {% if project.thumbnail_type == 'image' %}
+                                <img src="{{ project.thumbnail_url }}" class="img-fluid w-100 h-100 object-fit-cover"
+                                     style="cursor:pointer;"
+                                     data-pid="{{ project.request_id }}"
+                                     data-desc="{{ project.description|default:'No description'|escapejs }}"
+                                     data-date="{{ project.created_at|date:'M d, Y' }}"
+                                     data-status="{{ project.status|default:'Pending'|title|escapejs }}"
+                                     data-img="{{ project.thumbnail_url|escapejs }}"
+                                     data-type="image"
+                                     onclick="openProjectModalFromElement(this)">
+                            {% elif project.thumbnail_type == 'model' %}
+                                <img src="{% static 'images/3d-placeholder.jpg' %}" style="cursor:pointer;"
+                                     data-type="model"
+                                     data-img="{{ project.model_3d.url }}"
+                                     data-pid="{{ project.request_id }}"
+                                     data-desc="{{ project.description|default:'No description'|escapejs }}"
+                                     data-date="{{ project.created_at|date:'M d, Y' }}"
+                                     data-status="{{ project.status|default:'Pending'|title|escapejs }}"
+                                     onclick="openProjectModalFromElement(this)">
+                            {% else %}
+                                <div class="text-center" style="cursor:pointer;" onclick="openProjectModalFromElement(this)">
+                                    <i class="fas fa-file fa-4x text-secondary"></i>
+                                    <p class="mt-2 small">File</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title text-primary mb-2">Project #{{ project.request_id }}</h5>
+                            <p class="card-text text-muted small mb-3">{{ project.description|truncatewords:18 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary small">
+                                    <i class="bi bi-calendar-event"></i> {{ project.created_at|date:"M d, Y" }}
+                                </span>
+                                <span class="badge bg-success">{{ project.status|default:'Pending'|title }}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 text-center pb-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm px-4 rounded-pill"
+                               data-pid="{{ project.request_id }}"
+                               data-desc="{{ project.description|default:'No description'|escapejs }}"
+                               data-date="{{ project.created_at|date:'M d, Y' }}"
+                               data-status="{{ project.status|default:'Pending'|title|escapejs }}"
+                               data-type="{{ project.thumbnail_type }}"
+                               data-img="{% if project.thumbnail_type == 'image' %}{{ project.thumbnail_url|escapejs }}{% else %}{{ project.model_3d.url }}{% endif %}"
+                               onclick="openProjectModalFromElement(this)">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <p>No projects available for this engineer yet.</p>
+            </div>
+        {% endif %}
+
+        <!-- Project Modal -->
+        <div class="modal fade" id="projectModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="projectModalTitle">Project Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                <div id="projectModalMedia" class="mb-3"></div>
+                <p id="projectModalDesc"></p>
+                <p><strong>Date:</strong> <span id="projectModalDate"></span></p>
+                <p><strong>Status:</strong> <span id="projectModalStatus"></span></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openProjectModalFromElement(el) {
+    const title = "Project #" + el.dataset.pid;
+    const desc = el.dataset.desc || '';
+    const date = el.dataset.date || 'N/A';
+    const status = el.dataset.status || 'Pending';
+    const img = el.dataset.img || '';
+    const type = el.dataset.type || 'image';
+
+    document.getElementById("projectModalTitle").innerText = title;
+    document.getElementById("projectModalDesc").innerText = desc;
+    document.getElementById("projectModalDate").innerText = date;
+    document.getElementById("projectModalStatus").innerText = status;
+
+    const mediaContainer = document.getElementById("projectModalMedia");
+    mediaContainer.innerHTML = '';
+
+    if (type === 'image') {
+        mediaContainer.innerHTML = `<img src="${img}" class="img-fluid rounded" alt="Project Image">`;
+    } 
+    else if (type === 'model') {
+        mediaContainer.innerHTML = `
+            <model-viewer
+                src="${img}"
+                alt="3D Model"
+                camera-controls
+                auto-rotate
+                shadow-intensity="1"
+                style="width:100%; height:400px; background:#f3f3f3;">
+            </model-viewer>
+        `;
+    } 
+    else if (type === 'file') {
+        mediaContainer.innerHTML = `<a href="${img}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file"></i> Open File</a>`;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('projectModal'));
+    modal.show();
+}
+</script>
+
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    {% for message in messages %}
+    Swal.fire({
+        icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% else %}info{% endif %}",
+        title: "{{ message|escapejs }}",
+        showConfirmButton: false,
+        timer: 3000
+    });
+    {% endfor %}
+});
+</script>
+{% endif %}
 {% endblock %}
