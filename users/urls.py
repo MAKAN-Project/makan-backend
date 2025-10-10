@@ -14,6 +14,7 @@ urlpatterns = [
     path('reschedule-session/<int:session_id>/', views.reschedule_session, name='reschedule_session'),
     path('choose-building-stage/', views.choose_building_stage, name='choose_building_stage'),
     path('engineering-fields/<str:stage>/', views.engineering_fields, name='engineering_fields'),
-    path('engineer/<int:eng_id>/', views.engineer_detail, name='engineer_detail'),
+    path('engineer/<int:eng_id>/', views.engineer_details, name='engineer_details'),
+    
     # path('back-to-scratch/', views.back_to_scratch, name='back_to_scratch')
 ]

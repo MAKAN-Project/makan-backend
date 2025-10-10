@@ -12,19 +12,49 @@ from users.models import User
 from engineers.models import Engineer
 from django.contrib.auth.hashers import make_password, check_password
 from airequests.models import AIRequest
-
-
+from datetime import datetime
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from notifications.utils import create_notification
+from engineers.models import EngineerAvailability
 
 def reschedule_session(request, session_id):
     if request.method == 'POST':
-        new_time = request.POST.get('new_scheduled_at')
-        session = Session.objects.get(id=session_id)
-        session.scheduled_at = new_time
-        session.status = 'pending_approval'  # Add this status to your model if not present
+        new_date = request.POST.get('date')
+        new_time = request.POST.get('time')
+
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            messages.error(request, "⚠️ الجلسة غير موجودة.")
+            return redirect('sessions_list')
+
+        # دمج التاريخ والوقت الجديد
+        try:
+            new_datetime = datetime.strptime(f"{new_date} {new_time}", "%Y-%m-%d %H:%M")
+        except ValueError:
+            messages.error(request, "⚠️ التاريخ أو الوقت غير صالح.")
+            return redirect('sessions_list')
+
+        # ✅ حفظ الوقت القديم قبل التعديل
+        session.old_scheduled_at = session.scheduled_at
+        session.scheduled_at = new_datetime
+        session.status = 'reschedule_pending'
         session.save()
-        # Optionally notify engineer here
-        return redirect('customer_dashboard')
-    return redirect('customer_dashboard')
+
+        # ✅ إنشاء إشعار للمهندس
+        Notification.objects.create(
+            recipient=session.eng.user,  # المهندس
+            sender=User.objects.get(user_id=request.session['user_id']),  # العميل الحالي
+            type='reschedule',
+            message=f"قام {request.session.get('first_name')} بطلب إعادة جدولة الجلسة من {session.old_scheduled_at.strftime('%Y-%m-%d %H:%M')} إلى {new_datetime.strftime('%Y-%m-%d %H:%M')}.",
+        )
+
+        messages.success(request, "✅ تم إرسال طلب إعادة الجدولة بنجاح.")
+        return redirect('sessions_list')
+
+    return redirect('sessions_list')
+
 
 
 # --- Building Project Stage Selection ---
@@ -60,37 +90,95 @@ def engineering_fields(request, stage):
     
 # --- Customer Dashboard Form Actions ---
 def reserve_session(request):
+    print(list(messages.get_messages(request)))
+
+    engineer_id = request.GET.get('engineer_id') or request.POST.get('engineer_id')
+
+    available_slots = []
+    if engineer_id:
+        available_slots = EngineerAvailability.objects.filter(
+            engineer_id=engineer_id,
+            is_booked=False,
+            date__gte=timezone.now().date()
+        ).order_by('date', 'start_time')
+
     if request.method == 'POST':
-        engineer_id = request.POST.get('engineer_id')
         project_description = request.POST.get('project_description')
-        customer_files = request.FILES.getlist('customer_files')
+        customer_files = request.FILES.getlist('file')
+        selected_slot_id = request.POST.get('selected_slot')
         user_id = request.session.get('user_id')
-        if not user_id or not engineer_id:
-            return redirect('customer_dashboard')
+
+        # ✅ تحقق من البيانات المطلوبة
+        if not user_id or not engineer_id or not selected_slot_id:
+            messages.error(request, "⚠️ Missing required information.")
+            return render(request, 'engineer_details.html', {'available_slots': available_slots})
+
         try:
             client = User.objects.get(user_id=user_id)
             engineer = Engineer.objects.get(eng_id=engineer_id)
-        except (User.DoesNotExist, Engineer.DoesNotExist):
-            return redirect('customer_dashboard')
-        # Handle file upload (optional, if you want to save files)
-        file_obj = None
-        if customer_files:
-            from files.models import File
-            for f in customer_files:
-                file_obj = File.objects.create(file=f, user=client)
-        ProjectRequest.objects.create(
+            slot = EngineerAvailability.objects.get(id=selected_slot_id, engineer=engineer, is_booked=False)
+        except User.DoesNotExist:
+            messages.error(request, "⚠️ User not found.")
+            return redirect('login_register')
+        except Engineer.DoesNotExist:
+            messages.error(request, "⚠️ Engineer not found.")
+            return redirect('home')
+        except EngineerAvailability.DoesNotExist:
+            messages.error(request, "⚠️ Selected slot is no longer available.")
+            return redirect('engineer_details', eng_id=engineer_id)
+
+        # ✅ دمج التاريخ والوقت
+        scheduled_at = timezone.make_aware(datetime.combine(slot.date, slot.start_time))
+
+        # ✅ إنشاء المشروع
+        project_request = ProjectRequest.objects.create(
             client=client,
             engineer=engineer,
-            description=project_description,
-            file=file_obj,
-            status='pending'
+            description=project_description or "No description provided",
+            status='pending',
+            selected_availability=slot
         )
-        # Optionally, add a success message
-        from django.contrib import messages
-        messages.success(request, 'Your request has been sent to the engineer.')
-        return redirect('customer_dashboard')
-    return redirect('customer_dashboard')
 
+        # ✅ إنشاء إشعار للمهندس
+        Notification.objects.create(
+            recipient=engineer.user,        # المهندس المستقبِل
+            sender=client,                  # العميل المرسل
+            project_request=project_request,
+            type='project_request',         # مطابق للـ choices
+            message=f"طلب جديد من {client.first_name} {client.last_name} بخصوص '{project_request.description[:30]}...'."
+        )
+
+        # ✅ حفظ الملفات
+        if customer_files:
+            for f in customer_files:
+                if not f:
+                    continue
+                File.objects.create(
+                    type=f.content_type.split('/')[-1],
+                    file_name=f.name,
+                    file=f,
+                    user=client,
+                    project_request=project_request
+                )
+
+        # ✅ إنشاء الجلسة (Session)
+        Session.objects.create(
+            user=client,
+            eng=engineer,
+            scheduled_at=scheduled_at,
+            status="pending"
+        )
+
+        # ✅ تحديث الـ Slot
+        slot.is_booked = True
+        slot.save()
+
+        messages.success(request, "✅ تم إرسال طلب الجلسة والمشروع بنجاح.")
+        return redirect('engineer_details', eng_id=engineer_id)
+
+    return render(request, 'engineer_details.html', {
+        'available_slots': available_slots,
+    })
 
 def upload_room_photo(request):
     # TODO: Implement room photo upload logic
@@ -282,11 +370,58 @@ def customer_dashboard(request):
 }
     return render(request, "customer_dashboard.html", context)
 
-def engineer_detail(request, eng_id):
-    # Get the engineer or show 404 if not found
-    engineer = get_object_or_404(Engineer, eng_id=eng_id)
+def engineer_details(request, eng_id):
+    engineer = get_object_or_404(Engineer, pk=eng_id)
     
+    # 🔹 جلب المشاريع المكتملة فقط
+    projects = ProjectRequest.objects.filter(engineer=engineer).order_by('-created_at')
+    projects_data = []
+
+    for project in projects:
+        if project.status.lower() != 'completed':
+            continue
+
+        project_files = File.objects.filter(project_request=project)
+        thumbnail_url = ''
+        thumbnail_type = 'file'
+
+        if project_files.exists():
+            first_file = project_files.first()
+            file_type = first_file.type.lower()
+
+            if file_type in ['image', 'jpg', 'jpeg', 'png']:
+                thumbnail_url = first_file.file.url
+                thumbnail_type = 'image'
+            elif file_type in ['gltf', 'glb']:
+                thumbnail_url = first_file.file.url
+                thumbnail_type = 'model'
+            if first_file and first_file.file:
+             thumbnail_url = first_file.file.url
+            else:
+             thumbnail_url = '/static/images/default-thumbnail.jpg'  # أو أي صورة بديلة عندك
+
+        projects_data.append({
+            'request_id': project.request_id,
+            'description': project.description,
+            'status': project.status,
+            'created_at': project.created_at,
+            'thumbnail_url': thumbnail_url,
+            'thumbnail_type': thumbnail_type,
+        })
+
+    # 🔹 جلب المواعيد المتاحة فقط (المستقبلية وغير المحجوزة)
+        available_slots = EngineerAvailability.objects.filter(
+            engineer=engineer,
+            is_booked=False,
+            date__gte=timezone.now().date()
+        ).order_by('date', 'start_time')
+
+
+    # 🔹 تمرير البيانات للقالب
     context = {
-        'engineer': engineer
+        'engineer': engineer,
+        'projects': projects_data,
+        'available_slots': available_slots,  # ✅ تمام
     }
+
     return render(request, 'engineer_details.html', context)

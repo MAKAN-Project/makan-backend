@@ -63,3 +63,17 @@ class Engineer(models.Model):
 
     def __str__(self):
         return f"Engineer {self.user.first_name} {self.user.last_name}"
+class EngineerAvailability(models.Model):
+    engineer = models.ForeignKey('Engineer', on_delete=models.CASCADE, related_name='availabilities')
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_booked = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'engineer_availabilities'
+        unique_together = ('engineer', 'date', 'start_time', 'end_time')
+        ordering = ['date', 'start_time']
+
+    def __str__(self):
+        return f"{self.engineer.user.first_name} - {self.date} ({self.start_time} - {self.end_time})"

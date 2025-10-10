@@ -12,7 +12,6 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <!-- Small overrides loaded last to neutralize vendor themes if present -->
   <link rel="stylesheet" href="{% static 'css/override.css' %}">
 
   {% block extra_head %}{% endblock %}
@@ -20,23 +19,20 @@
 <body>
 
 <!-- ===== NAVBAR ===== -->
-<nav  id="mainNavbar" class="navbar navbar-expand-lg fixed-top shadow-sm py-3">
+<nav id="mainNavbar" class="navbar navbar-expand-lg fixed-top shadow-sm py-3">
   <div class="container">
-    <!-- Logo -->
-   <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="{% static 'images/logo.png' %}" alt="MAKAN Logo" class="me-2">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+      <img id="siteLogo" src="{% static 'images/logo.png' %}" alt="MAKAN Logo" class="me-2"
+           data-light-src="{% static 'images/logo.png' %}"
+           data-dark-src="{% static 'images/logo-dark.png' %}">
     </a>
 
-    <!-- Mobile Toggle -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-      aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-        <!-- Main Links -->
         <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Home</a></li>
         <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Projects</a></li>
         <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Engineers</a></li>
@@ -44,63 +40,63 @@
         <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
 
         <!-- Notifications -->
-        <!-- Notifications -->
-<li class="nav-item dropdown ms-lg-3">
-  <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="bi bi-bell fs-5"></i>
-    {% if pending_notifications %}
-      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
-        {{ pending_notifications|length }}
-      </span>
-    {% endif %}
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
-    {% if pending_notifications %}
-      {% for notif in pending_notifications %}
-        <li class="p-3 border-bottom d-flex justify-content-between align-items-start">
-          <div>
-            <div class="fw-semibold">
-              {% if notif.sender %}
-                {{ notif.sender.first_name }} {{ notif.sender.last_name }}
-              {% else %}
-                {{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}
-              {% endif %}
-            </div>
-            <small class="text-muted">{{ notif.created_at|date:"Y-m-d H:i" }}</small>
-          </div>
-          <button class="btn btn-sm btn-outline-primary view-request-btn"
-            data-bs-toggle="modal" data-bs-target="#requestModal"
-            data-request-id="{{ notif.project_request.request_id }}"
-            data-description="{{ notif.project_request.description }}"
-            {% if notif.sender %}
-              data-sender="{{ notif.sender.first_name }} {{ notif.sender.last_name }}"
-            {% else %}
-              data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
-            {% endif %}
-            {% if notif.project_request.file %}
-              data-file-url="{{ notif.project_request.file.file.url }}"
-              data-file-name="{{ notif.project_request.file.file_name }}"
-            {% endif %}>
-            View
-          </button>
-        </li>
-      {% endfor %}
-    {% else %}
-      <li class="p-3 text-center text-muted">No new notifications</li>
-    {% endif %}
-  </ul>
-</li>
-
-        <!-- User Dropdown -->
         <li class="nav-item dropdown ms-lg-3">
-          <button class="btn btn-light rounded-circle p-2" id="userBtn" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle fs-5"></i>
+          <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown">
+            <i class="bi bi-bell fs-5"></i>
+            {% if pending_notifications %}
+              <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+                {{ pending_notifications|length }}
+              </span>
+            {% endif %}
           </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'logout_user' %}">Logout</a></li>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
+            {% if pending_notifications %}
+              {% for notif in pending_notifications %}
+                <li class="p-3 border-bottom d-flex justify-content-between align-items-start {% if not notif.is_read %}bg-light{% endif %}"
+                    data-id="{{ notif.id }}">
+                  <div>
+                    <div class="mb-1 notification-message" style="white-space: pre-line;">{{ notif.message|safe }}</div>
+
+
+                    <small class="text-muted">
+                      {% if notif.sender %} FROM {{ notif.sender.first_name }}{% else %}System{% endif %}
+                      • {{ notif.created_at|date:"Y-m-d H:i" }}
+                    </small>
+                  </div>
+
+                  {% if notif.project_request %}
+                    <button
+                      class="btn btn-sm btn-outline-primary view-request-btn"
+                      data-notif-id="{{ notif.id }}"
+                      data-bs-toggle="modal"
+                      data-bs-target="#requestModal"
+                      data-request-id="{{ notif.project_request.request_id }}"
+                      data-description="{{ notif.project_request.description|escape }}"
+                      data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
+                      data-accept-url="{% url 'accept_project_request' notif.project_request.request_id %}"
+                      data-reject-url="{% url 'reject_project_request' notif.project_request.request_id %}"
+                      {% with files=notif.project_request.files.all %}
+                        {% if files|length %}
+                          data-file-url="{{ files.0.file.url }}"
+                          data-file-name="{{ files.0.file_name|escape }}"
+                        {% endif %}
+                      {% endwith %}
+                      {% if notif.project_request.session %}
+                        data-zoom-link="{{ notif.project_request.session.meeting_link }}"
+                      {% endif %}
+                    >View</button>
+                  {% endif %}
+                </li>
+              {% endfor %}
+              <li>
+                <a href="#" class="dropdown-item text-center" data-bs-toggle="modal" data-bs-target="#allNotificationsModal">
+                  View All
+                </a>
+              </li>
+            {% else %}
+              <li class="p-3 text-center text-muted">No new notifications</li>
+            {% endif %}
           </ul>
         </li>
       </ul>
@@ -108,13 +104,7 @@
   </div>
 </nav>
 
-
-<!-- ===== MAIN CONTENT ===== -->
-<main class="mt-6 pt-5" style="margin-top: 90px;">
-  {% block content %}{% endblock %}
-</main>
-
-<!-- ===== MODAL ===== -->
+<!-- ===== Project Request Modal ===== -->
 <div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content rounded-4 shadow-lg">
@@ -123,6 +113,7 @@
           <h5 class="modal-title">Project Request Details</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
         <div class="modal-body">
           <p><strong>Client:</strong> <span id="modalClient"></span></p>
           <p><strong>Request ID:</strong> <span id="modalRequestId"></span></p>
@@ -137,11 +128,22 @@
             <p id="modalFile"></p>
           </div>
 
+          <!-- ✅ Zoom Meeting Link -->
+          <div id="modalZoomContainer" class="mt-3 d-none">
+            <strong>Zoom Meeting Link:</strong>
+            <div class="alert alert-info mt-2">
+              <a id="modalZoomLink" href="#" target="_blank" class="fw-semibold text-decoration-none">
+                <i class="bi bi-camera-video me-1"></i> Join Meeting
+              </a>
+            </div>
+          </div>
+
           <div class="mt-3">
             <label for="scheduled_at" class="form-label">Session Date & Time</label>
             <input id="scheduled_at" name="scheduled_at" type="datetime-local" required class="form-control">
           </div>
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
           <button type="submit" id="acceptBtn" formaction="" class="btn btn-success rounded-pill">Accept & Schedule</button>
@@ -152,72 +154,63 @@
   </div>
 </div>
 
-<!-- ===== FOOTER ===== -->
+<main class="mt-6 pt-5" style="margin-top: 90px;">
+  {% block content %}{% endblock %}
+</main>
+
 <footer class="site-footer">
-  <div class="container py-5">
-    <div class="row gy-4">
-      
-      <!-- Logo & About -->
-      <div class="col-md-4">
-      <a href="home.html"><h2 class="footer-brand mb-3">MAKAN</h2></a>
-        <p class="footer-text">
-          MAKAN is a platform connecting clients with professional engineers, 
-          providing innovative architecture and interior design solutions powered by AI and 3D technology.
-        </p>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="col-md-4">
-        <h5 class="footer-title">Quick Links</h5>
-        <ul class="footer-links list-unstyled">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Our Services</a></li>
-          <li><a href="#">Portfolio</a></li>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </div>
-
-      <!-- Contact & Social -->
-      <div class="col-md-4">
-        <h5 class="footer-title">Contact</h5>
-        <p class="footer-text mb-2">📧 info@makan.com</p>
-        <p class="footer-text mb-4">📞 +972 599 000 000</p>
-        <div class="social-icons">
-          <a href="#"><i class="bi bi-facebook"></i></a>
-          <a href="#"><i class="bi bi-instagram"></i></a>
-          <a href="#"><i class="bi bi-linkedin"></i></a>
-          <a href="#"><i class="bi bi-twitter"></i></a>
-        </div>
-      </div>
-
-    </div>
-
-    <hr class="footer-divider my-4">
-
-    <div class="text-center footer-bottom">
-      <p class="mb-0">&copy; 2025 <span class="text-accent">MAKAN</span>. All Rights Reserved.</p>
-    </div>
+  <div class="container py-5 text-center">
+    <p class="mb-0">&copy; 2025 <span class="text-accent">MAKAN</span>. All Rights Reserved.</p>
   </div>
 </footer>
+
 <!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  // Unified scripts: modal population + navbar scroll + logo swap
-  (function () {
-    // Modal populate dynamically
+document.addEventListener('DOMContentLoaded', () => {
+  const notifBadge = document.getElementById('notifBadge');
+
+  function markAsRead(notifId, liElement) {
+    if (!notifId) return;
+    fetch(`/notifications/read/${notifId}/`).then(() => {
+      if (liElement) liElement.classList.remove('bg-light');
+      if (notifBadge) {
+        let count = parseInt(notifBadge.textContent || '0', 10);
+        if (!isNaN(count) && count > 0) {
+          count = Math.max(0, count - 1);
+          if (count === 0) notifBadge.remove();
+          else notifBadge.textContent = count;
+        }
+      }
+    }).catch(console.error);
+  }
+
+  function initViewButtons() {
     document.querySelectorAll('.view-request-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = 'true';
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const notifId = btn.dataset.notifId;
         const requestId = btn.dataset.requestId;
-        const description = btn.dataset.description;
-        const client = btn.dataset.client;
-        const fileUrl = btn.dataset.fileUrl;
-        const fileName = btn.dataset.fileName;
+        const description = btn.dataset.description || '';
+        const client = btn.dataset.client || '';
+        const fileUrl = btn.dataset.fileUrl || '';
+        const fileName = btn.dataset.fileName || '';
+        const zoomLink = btn.dataset.zoomLink || '';
+        const acceptUrl = btn.dataset.acceptUrl || '';
+        const rejectUrl = btn.dataset.rejectUrl || '';
+
+        const parentLi = btn.closest('li[data-id]');
+        markAsRead(notifId, parentLi);
 
         document.getElementById('modalRequestId').textContent = requestId;
         document.getElementById('modalDescription').textContent = description;
         document.getElementById('modalClient').textContent = client;
 
+        // File
         const fileContainer = document.getElementById('modalFileContainer');
         const fileElement = document.getElementById('modalFile');
         if (fileUrl) {
@@ -227,48 +220,31 @@
           fileContainer.classList.add('d-none');
           fileElement.innerHTML = '';
         }
+
+        // ✅ Zoom link
+        const zoomContainer = document.getElementById('modalZoomContainer');
+        const zoomAnchor = document.getElementById('modalZoomLink');
+        if (zoomLink) {
+          zoomContainer.classList.remove('d-none');
+          zoomAnchor.href = zoomLink;
+        } else {
+          zoomContainer.classList.add('d-none');
+          zoomAnchor.href = '#';
+        }
+
+        // Buttons
+        const acceptBtn = document.getElementById('acceptBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+        if (acceptBtn && acceptUrl) acceptBtn.setAttribute('formaction', acceptUrl);
+        if (rejectBtn && rejectUrl) rejectBtn.setAttribute('formaction', rejectUrl);
       });
     });
+  }
 
-    // Navbar scroll effect + logo swap
-    const navbar = document.getElementById('mainNavbar');
-    const logo = document.getElementById('siteLogo');
-
-    // Helper to set logo based on state
-    function setLogo(isScrolled) {
-      if (!logo) return;
-      const light = logo.dataset.lightSrc;
-      const dark = logo.dataset.darkSrc;
-      logo.src = isScrolled ? dark : light;
-    }
-
-    function onScroll() {
-      const scrolled = window.scrollY > 50;
-      if (scrolled) {
-        navbar.classList.add('scrolled');
-        navbar.classList.remove('transparent');
-      } else {
-        navbar.classList.remove('scrolled');
-        // keep transparent only on pages that request it via .transparent class
-        if (navbar.dataset.allowTransparent === 'true') {
-          navbar.classList.add('transparent');
-        }
-      }
-      setLogo(scrolled);
-    }
-
-    // If on the homepage we want transparent navbar at top, mark it here.
-    // You can set data-allow-transparent="true" server-side for pages that need it.
-    if (window.location.pathname === '/' || window.location.pathname.endsWith('/home')) {
-      navbar.dataset.allowTransparent = 'true';
-      navbar.classList.add('transparent');
-      setLogo(false);
-    }
-
-    window.addEventListener('scroll', onScroll);
-    // initial run
-    onScroll();
-  })();
+  initViewButtons();
+});
 </script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>
