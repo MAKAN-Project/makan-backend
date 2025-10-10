@@ -2,35 +2,24 @@ from django.shortcuts import render
 from django.conf import settings
 import os
 from projectrequests.models import ProjectRequest
-from engineers.models import Engineer  # استيراد الموديل
+from engineers.models import Engineer
+from users.models import User
+from notifications.models import Notification
+
 
 def home(request):
-    """Home view: portfolio gallery + engineers section."""
-
     selected_filter = request.GET.get('filter', 'All').lower()
-
-    # 🔹 Portfolio
-    qs = ProjectRequest.objects.filter(status__iexact='completed').select_related('file', 'engineer')
     items = []
     media_url = getattr(settings, 'MEDIA_URL', '/media/')
-    folder_map = {
-        'architecture': 'arch',
-        'interior': 'dicor',
-        '3d_models': '3d'
-    }
+    folder_map = {'architecture': 'arch', 'interior': 'dicor', '3d_models': '3d'}
 
-    folder = folder_map.get(selected_filter, None)
-
+    # 🔹 Portfolio logic (بدون تغيير)
+    folder = folder_map.get(selected_filter)
     if folder:
-        folder_dir = os.path.join(getattr(settings, 'MEDIA_ROOT', 'media'), 'projects', folder)
-        try:
-            files = sorted(os.listdir(folder_dir), reverse=True)
-        except Exception:
-            files = []
-
+        folder_dir = os.path.join(settings.MEDIA_ROOT, 'projects', folder)
+        files = sorted(os.listdir(folder_dir), reverse=True) if os.path.exists(folder_dir) else []
         for fname in files[:4]:
-            lower = fname.lower()
-            if any(lower.endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.webp', '.gif')):
+            if fname.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif')):
                 items.append({
                     'url': f"{media_url}projects/{folder}/{fname}",
                     'file_type': 'image',
@@ -39,28 +28,39 @@ def home(request):
                 })
     else:
         for cat, folder_name in folder_map.items():
-            folder_dir = os.path.join(getattr(settings, 'MEDIA_ROOT', 'media'), 'projects', folder_name)
-            try:
-                files = sorted(os.listdir(folder_dir), reverse=True)
-            except Exception:
-                files = []
-
-            count = 0
-            for fname in files:
-                lower = fname.lower()
-                if any(lower.endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.webp', '.gif')):
+            folder_dir = os.path.join(settings.MEDIA_ROOT, 'projects', folder_name)
+            files = sorted(os.listdir(folder_dir), reverse=True) if os.path.exists(folder_dir) else []
+            for fname in files[:4]:
+                if fname.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif')):
                     items.append({
                         'url': f"{media_url}projects/{folder_name}/{fname}",
                         'file_type': 'image',
                         'file_name': fname,
                         'category': cat
                     })
-                    count += 1
-                    if count >= 4:
-                        break
 
-    # 🔹 Engineers section
+    # 🔹 Engineers
     engineers = Engineer.objects.filter(status="approved")
+
+    # 🔹 Notifications (المشكلة كانت هنا)
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+
+        all_notifications = Notification.objects.filter(
+            recipient=user
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')
+    else:
+        pending_notifications = []
+        all_notifications = []
 
     return render(request, 'home.html', {
         'portfolio_items': items,
@@ -71,5 +71,8 @@ def home(request):
             '/static/images/3.webp',
             '/static/images/4.webp'
         ],
-        'engineers': engineers,  # إضافة المهندسين للـ template
+        'engineers': engineers,
+        'pending_notifications': pending_notifications,
+        'all_notifications': all_notifications,
     })
+

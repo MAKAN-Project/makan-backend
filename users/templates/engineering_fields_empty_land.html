@@ -23,221 +23,126 @@
 
   <div class="d-flex flex-column gap-4">
 
-
-    {% comment %} ===== Architecture Carousel ===== {% endcomment %}
+    <!-- ===== Architecture Carousel ===== -->
     <div class="card h-100 shadow-sm specialization-carousel" data-specialization="architecture">
       <div class="card-body">
         <h5 class="card-title mb-3">Architecture</h5>
         <div class="position-relative">
-          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('architecture-carousel', -1)">&lt;</button>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y"
+            type="button" onclick="scrollEngineers('architecture-carousel', -1)">&lt;</button>
           <div id="architecture-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in architecture_engineers %}
-            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#engineerModal{{ engineer.eng_id }}">
-              <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
-              <div class="card-body text-center">
-                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
-                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
-              </div>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="engineerModal{{ engineer.eng_id }}" tabindex="-1" aria-labelledby="engineerModalLabel{{ engineer.eng_id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="engineerModalLabel{{ engineer.eng_id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded mb-3" alt="Engineer Photo">
-                    <p><strong>Email:</strong> {{ engineer.user.email }}</p> <a href="{% url 'engineer_detail' engineer.eng_id %}" class="btn btn-primary engineer-btn w-100 ms-2">View Engineer Profile</a>
-
-                    <p><strong>Specialty:</strong> {{ engineer.specialization|title }}</p>
-                    <form method="post" action="{% url 'reserve_session' %}" enctype="multipart/form-data">
-                      {% csrf_token %}
-                      
-                      <div class="mb-3">
-                        <label for="customerFiles{{ engineer.eng_id }}" class="form-label">Upload Files/Images</label>
-                        <input type="file" class="form-control" id="customerFiles{{ engineer.eng_id }}" name="customer_files" multiple>
-                      </div>
-                      <div class="mb-3">
-                        <label for="projectDescription{{ engineer.eng_id }}" class="form-label">Project Description</label>
-                        <textarea class="form-control" id="projectDescription{{ engineer.eng_id }}" name="project_description" rows="4" placeholder="Describe your project..." required></textarea>
-                      </div>
-                      <input type="hidden" name="engineer_id" value="{{ engineer.eng_id }}">
-                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
-                    </form>
-                  </div>
+            <a href="{% url 'engineer_details' engineer.eng_id %}" class="text-decoration-none text-dark">
+              <div class="card engineer-card">
+                <img
+                  src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}"
+                  class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+                <div class="card-body text-center">
+                  <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                  <p class="card-text small text-muted">{{ engineer.user.email }}</p>
                 </div>
               </div>
-            </div>
+            </a>
             {% empty %}
             <div class="text-muted">No architecture engineers available.</div>
             {% endfor %}
           </div>
           <script>document.getElementById('architecture-carousel').dataset.startIdx = 0;</script>
-          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('architecture-carousel', 1)">&gt;</button>
+          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button"
+            onclick="scrollEngineers('architecture-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
 
-    {% comment %} ===== Civil Engineering Carousel ===== {% endcomment %}
+    <!-- ===== Civil Engineering Carousel ===== -->
     <div class="card h-100 shadow-sm specialization-carousel" data-specialization="civil">
       <div class="card-body">
         <h5 class="card-title mb-3">Civil Engineering</h5>
         <div class="position-relative">
-          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('civil-carousel', -1)">&lt;</button>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y"
+            type="button" onclick="scrollEngineers('civil-carousel', -1)">&lt;</button>
           <div id="civil-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in civil_engineers %}
-            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#civilEngineerModal{{ engineer.eng_id }}">
-              <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
-              <div class="card-body text-center">
-                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
-                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
-              </div>
-            </div>
-            <!-- Modal -->
-            <div class="modal fade" id="civilEngineerModal{{ engineer.eng_id }}" tabindex="-1" aria-labelledby="civilEngineerModalLabel{{ engineer.eng_id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="civilEngineerModalLabel{{ engineer.eng_id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded mb-3" alt="Engineer Photo">
-                    <p><strong>Email:</strong> {{ engineer.user.email }}</p><a href="{% url 'engineer_detail' engineer.eng_id %}" class="btn btn-primary engineer-btn w-100 ms-2">View Engineer Profile</a>
-                    <p><strong>Specialty:</strong> {{ engineer.specialization|title }}</p>
-                    <form method="post" action="{% url 'reserve_session' %}" enctype="multipart/form-data">
-                      {% csrf_token %}
-                      
-                      <div class="mb-3">
-                        <label for="customerFilesCivil{{ engineer.eng_id }}" class="form-label">Upload Files/Images</label>
-                        <input type="file" class="form-control" id="customerFilesCivil{{ engineer.eng_id }}" name="customer_files" multiple>
-                      </div>
-                      <div class="mb-3">
-                        <label for="projectDescription{{ engineer.eng_id }}" class="form-label">Project Description</label>
-                        <textarea class="form-control" id="projectDescription{{ engineer.eng_id }}" name="project_description" rows="4" placeholder="Describe your project..." required></textarea>
-                      </div>
-                      <input type="hidden" name="engineer_id" value="{{ engineer.eng_id }}">
-                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
-                    </form>
-                  </div>
+            <a href="{% url 'engineer_details' engineer.eng_id %}" class="text-decoration-none text-dark">
+              <div class="card engineer-card">
+                <img
+                  src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}"
+                  class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+                <div class="card-body text-center">
+                  <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                  <p class="card-text small text-muted">{{ engineer.user.email }}</p>
                 </div>
               </div>
-            </div>
+            </a>
             {% empty %}
             <div class="text-muted">No civil engineers available.</div>
             {% endfor %}
           </div>
           <script>document.getElementById('civil-carousel').dataset.startIdx = 0;</script>
-          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('civil-carousel', 1)">&gt;</button>
+          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button"
+            onclick="scrollEngineers('civil-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
 
-    {% comment %} ===== Mechanical Engineering Carousel ===== {% endcomment %}
+    <!-- ===== Mechanical Engineering Carousel ===== -->
     <div class="card h-100 shadow-sm specialization-carousel" data-specialization="mechanical">
       <div class="card-body">
         <h5 class="card-title mb-3">Mechanical Engineering</h5>
         <div class="position-relative">
-          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('mechanical-carousel', -1)">&lt;</button>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y"
+            type="button" onclick="scrollEngineers('mechanical-carousel', -1)">&lt;</button>
           <div id="mechanical-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in mechanical_engineers %}
-            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#mechanicalEngineerModal{{ engineer.eng_id }}">
-              <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
-              <div class="card-body text-center">
-                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
-                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
-              </div>
-            </div>
-            <!-- Modal -->
-            <div class="modal fade" id="mechanicalEngineerModal{{ engineer.eng_id }}" tabindex="-1" aria-labelledby="mechanicalEngineerModalLabel{{ engineer.eng_id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="mechanicalEngineerModalLabel{{ engineer.eng_id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded mb-3" alt="Engineer Photo">
-                    <p><strong>Email:</strong> {{ engineer.user.email }}</p><a href="{% url 'engineer_detail' engineer.eng_id %}" class="btn btn-primary engineer-btn w-100 ms-2">View Engineer Profile</a>
-                    <p><strong>Specialty:</strong> {{ engineer.specialization|title }}</p>
-                    <form method="post" action="{% url 'reserve_session' %}" enctype="multipart/form-data">
-                      {% csrf_token %}
-                      
-                      <div class="mb-3">
-                        <label for="customerFilesMech{{ engineer.eng_id }}" class="form-label">Upload Files/Images</label>
-                        <input type="file" class="form-control" id="customerFilesMech{{ engineer.eng_id }}" name="customer_files" multiple>
-                      </div>
-                      <div class="mb-3">
-                        <label for="projectDescription{{ engineer.eng_id }}" class="form-label">Project Description</label>
-                        <textarea class="form-control" id="projectDescription{{ engineer.eng_id }}" name="project_description" rows="4" placeholder="Describe your project..." required></textarea>
-                      </div>
-                      <input type="hidden" name="engineer_id" value="{{ engineer.eng_id }}">
-                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
-                    </form>
-                  </div>
+            <a href="{% url 'engineer_details' engineer.eng_id %}" class="text-decoration-none text-dark">
+              <div class="card engineer-card">
+                <img
+                  src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}"
+                  class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+                <div class="card-body text-center">
+                  <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                  <p class="card-text small text-muted">{{ engineer.user.email }}</p>
                 </div>
               </div>
-            </div>
+            </a>
             {% empty %}
             <div class="text-muted">No mechanical engineers available.</div>
             {% endfor %}
           </div>
           <script>document.getElementById('mechanical-carousel').dataset.startIdx = 0;</script>
-          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('mechanical-carousel', 1)">&gt;</button>
+          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button"
+            onclick="scrollEngineers('mechanical-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
 
-    {% comment %} ===== Interior Design Carousel ===== {% endcomment %}
+    <!-- ===== Interior Design Carousel ===== -->
     <div class="card h-100 shadow-sm specialization-carousel" data-specialization="interior">
       <div class="card-body">
         <h5 class="card-title mb-3">Interior Design</h5>
         <div class="position-relative">
-          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y" type="button" onclick="scrollEngineers('interior-carousel', -1)">&lt;</button>
+          <button class="btn btn-outline-secondary btn-sm position-absolute top-50 start-0 translate-middle-y"
+            type="button" onclick="scrollEngineers('interior-carousel', -1)">&lt;</button>
           <div id="interior-carousel" class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-5">
             {% for engineer in interior_engineers %}
-            <div class="card engineer-card" data-bs-toggle="modal" data-bs-target="#interiorEngineerModal{{ engineer.eng_id }}">
-              <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
-              <div class="card-body text-center">
-                <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
-                <p class="card-text small text-muted">{{ engineer.user.email }}</p>
-              </div>
-            </div>
-            <!-- Modal -->
-            <div class="modal fade" id="interiorEngineerModal{{ engineer.eng_id }}" tabindex="-1" aria-labelledby="interiorEngineerModalLabel{{ engineer.eng_id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="interiorEngineerModalLabel{{ engineer.eng_id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <img src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}" class="img-fluid rounded mb-3" alt="Engineer Photo">
-                    <p><strong>Email:</strong> {{ engineer.user.email }}</p><a href="{% url 'engineer_detail' engineer.eng_id %}" class="btn btn-primary engineer-btn w-100 ms-2">View Engineer Profile</a>
-                    <p><strong>Specialty:</strong> {{ engineer.specialization|title }}</p>
-                    <form method="post" action="{% url 'reserve_session' %}" enctype="multipart/form-data">
-                      {% csrf_token %}
-                     
-                      <div class="mb-3">
-                        <label for="projectDescription{{ engineer.eng_id }}" class="form-label">Project Description</label>
-                        <textarea class="form-control" id="projectDescription{{ engineer.eng_id }}" name="project_description" rows="4" placeholder="Describe your project..." required></textarea>
-                      </div>
-                      <input type="hidden" name="engineer_id" value="{{ engineer.eng_id }}">
-                      <button type="submit" class="btn btn-primary w-100">Send to Engineer</button>
-                    </form>
-                  </div>
+            <a href="{% url 'engineer_details' engineer.eng_id %}" class="text-decoration-none text-dark">
+              <div class="card engineer-card">
+                <img
+                  src="{% if engineer.profile_photo %}{{ engineer.profile_photo.url }}{% else %}/static/images/default-engineer.png{% endif %}"
+                  class="card-img-top" alt="Engineer Photo" style="height:120px;object-fit:cover;">
+                <div class="card-body text-center">
+                  <h6 class="card-title mb-1">{{ engineer.user.first_name }} {{ engineer.user.last_name }}</h6>
+                  <p class="card-text small text-muted">{{ engineer.user.email }}</p>
                 </div>
               </div>
-            </div>
+            </a>
             {% empty %}
             <div class="text-muted">No interior design engineers available.</div>
             {% endfor %}
           </div>
           <script>document.getElementById('interior-carousel').dataset.startIdx = 0;</script>
-          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button" onclick="scrollEngineers('interior-carousel', 1)">&gt;</button>
+          <button class="slider-btn position-absolute top-50 end-0 translate-middle-y" type="button"
+            onclick="scrollEngineers('interior-carousel', 1)">&gt;</button>
         </div>
       </div>
     </div>
@@ -246,7 +151,6 @@
 </div>
 
 <script>
-  // Filter function
   function filterBySpecialization() {
     const selected = document.getElementById('specializationSelect').value;
     const carousels = document.querySelectorAll('.specialization-carousel');
@@ -259,15 +163,13 @@
     });
   }
 
-  // Initialize sliders and filter
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     filterBySpecialization();
-    ['architecture-carousel','civil-carousel','mechanical-carousel','interior-carousel'].forEach(function(id){
-      if(document.getElementById(id)) showEngineers(id, 0, 6);
+    ['architecture-carousel', 'civil-carousel', 'mechanical-carousel', 'interior-carousel'].forEach(function (id) {
+      if (document.getElementById(id)) showEngineers(id, 0, 6);
     });
   });
 
-  // Existing slider functions (keep as-is)
   function showEngineers(carouselId, startIdx, visibleCount) {
     const carousel = document.getElementById(carouselId);
     const cards = carousel.querySelectorAll('.engineer-card');
@@ -276,6 +178,7 @@
     });
     carousel.dataset.startIdx = startIdx;
   }
+
   function scrollEngineers(carouselId, direction) {
     const carousel = document.getElementById(carouselId);
     const cards = carousel.querySelectorAll('.engineer-card');

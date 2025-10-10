@@ -15,5 +15,9 @@ urlpatterns = [
     path('accept_project_request/<int:request_id>/', views.accept_project_request, name='accept_project_request'),
 
     path('project_request/<int:request_id>/reject/', views.reject_project_request, name='reject_project_request'),
+    path('approve_reschedule/<int:session_id>/', views.approve_reschedule, name='approve_reschedule'),
+    path('reject_reschedule/<int:session_id>/', views.reject_reschedule, name='reject_reschedule'),
+    path('create-zoom-meeting/<int:session_id>/', views.create_zoom_meeting_view, name='create_zoom_meeting'),
+     path('availability/', views.manage_availability, name='manage_availability'),
 
 ]
