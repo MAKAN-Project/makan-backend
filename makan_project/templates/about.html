@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Makan - About Us</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/home_style.css' %}">
+    <style>
+        /* Add specific styles for the about page here if needed */
+        .about-page-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("{% static 'images/about-hero.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .team-member-card img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .team-member-card:hover img {
+            transform: translateY(-5px);
+        }
+
+        .navbar.scrolled {
+            background-color: #fff !important; /* Ensure the navbar is white when scrolled */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="about-page">
+
+    <nav id="mainNavbar" class="navbar navbar-expand-lg py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{% static 'images/logo.png' %}" alt="MAKAN Logo" class="me-2">
+            </a>
+            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">Engineers</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">AI Studio</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold active" aria-current="page" href="/about">About</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="{% url 'login_register' %}" class="btn btn-warning rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-person-circle me-1"></i> Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <header class="about-page-header">
+        <div class="container text-center">
+            <h1 class="display-3 fw-bold">About MAKAN</h1>
+            <p class="lead">Blending AI-powered design with professional engineering expertise.</p>
+        </div>
+    </header>
+
+    <section class="story-mission-section py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-3">Our Story and Vision</h2>
+                    <p class="lead text-muted">MAKAN was founded on the belief that cutting-edge technology and human creativity should converge to revolutionize architecture and interior design.</p>
+                    <p>We saw a gap between high-cost, slow traditional design processes and the potential speed and innovation offered by **Artificial Intelligence**. Our platform bridges this, offering clients rapid, tailored, and cost-effective design solutions.</p>
+                    <h5 class="fw-semibold mt-4">Our Mission:</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i> To make professional design services accessible to everyone.</li>
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i> To empower engineers with advanced AI tools.</li>
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i> To deliver stunning, functional, and sustainable spaces.</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="{% static 'images/architecture-blueprint.jpg' %}" alt="Architectural Blueprint and AI" class="img-fluid rounded-4 shadow-lg" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="my-5">
+
+    <section class="core-values-section py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-5">Why Choose MAKAN?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 rounded-4 h-100 bg-white shadow-sm">
+                        <i class="bi bi-cpu fs-1 text-primary mb-3"></i>
+                        <h5 class="fw-semibold">AI-Powered Efficiency</h5>
+                        <p class="small text-muted">Generate hundreds of design possibilities in minutes, drastically reducing initial design time and costs.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-4 h-100 bg-white shadow-sm">
+                        <i class="bi bi-person-workspace fs-1 text-primary mb-3"></i>
+                        <h5 class="fw-semibold">Expert Professionals</h5>
+                        <p class="small text-muted">Our designs are validated and finalized by a network of certified **Architecture and Interior Design engineers**.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-4 h-100 bg-white shadow-sm">
+                        <i class="bi bi-lightbulb fs-1 text-primary mb-3"></i>
+                        <h5 class="fw-semibold">Innovation & Quality</h5>
+                        <p class="small text-muted">We combine the latest 3D modeling and rendering techniques to provide you with realistic, high-quality visualizations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team-section py-5">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-5">Our Leadership</h2>
+            <div class="row justify-content-center g-4">
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-member-card p-3 h-100">
+                        <img src="{% static 'images/team-lead-1.jpg' %}" alt="Ahmad Al-Wadi" class="mb-3 shadow-sm" onerror="this.onerror=null; this.src='{% static 'images/default-user.png' %}'">
+                        <h5 class="fw-semibold mb-0">Ahmad Al-Wadi</h5>
+                        <p class="text-warning small fw-bold">CEO & Founder</p>
+                        <p class="small text-muted">Visionary leading the blend of technology and construction.</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-linkedin me-2"></i></a>
+                            <a href="#"><i class="bi bi-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-member-card p-3 h-100">
+                        <img src="{% static 'images/team-lead-2.jpg' %}" alt="Lina Hamdan" class="mb-3 shadow-sm" onerror="this.onerror=null; this.src='{% static 'images/default-user.png' %}'">
+                        <h5 class="fw-semibold mb-0">Lina Hamdan</h5>
+                        <p class="text-warning small fw-bold">Head of Design & AI</p>
+                        <p class="small text-muted">Expert in Interior Design and algorithm development.</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-linkedin me-2"></i></a>
+                            <a href="#"><i class="bi bi-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-member-card p-3 h-100">
+                        <img src="{% static 'images/team-lead-3.jpg' %}" alt="Omar Zayid" class="mb-3 shadow-sm" onerror="this.onerror=null; this.src='{% static 'images/default-user.png' %}'">
+                        <h5 class="fw-semibold mb-0">Omar Zayid</h5>
+                        <p class="text-warning small fw-bold">CTO</p>
+                        <p class="small text-muted">Driving the platform's technical innovation and performance.</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-linkedin me-2"></i></a>
+                            <a href="#"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section text-center py-5 text-white">
+        <div class="overlay"></div>
+        <div class="container position-relative">
+            <h2 class="fw-bold">Ready to transform your space?</h2>
+            <p class="lead mb-4">Upload your room and get your AI-powered design today.</p>
+            <a href="#" class="btn btn-warning btn-lg rounded-pill">Upload Your Room</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container py-5">
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <a href="home.html">
+                        <h2 class="footer-brand mb-3">MAKAN</h2>
+                    </a>
+                    <p class="footer-text">
+                        MAKAN is a platform connecting clients with professional engineers, providing
+                        innovative architecture and interior design solutions powered by AI and 3D technology.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Our Services</a></li>
+                        <li><a href="#">Portfolio</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Contact</h5>
+                    <p class="footer-text mb-2">📧 info@makan.com</p>
+                    <p class="footer-text mb-4">📞 +972 599 000 000</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="footer-divider my-2">
+            <div class="text-center footer-bottom">
+                <p class="mb-0">&copy; 2025 <span class="text-accent">MAKAN</span>. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const navbar = document.getElementById('mainNavbar');
+        // Ensure the navbar is scrolled down immediately on the about page
+        // as it doesn't have a large video header like home.html
+        navbar.classList.add('scrolled');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 80)
+                navbar.classList.add('scrolled');
+            else
+                navbar.classList.remove('scrolled');
+        });
+    </script>
+</body>
+
+</html>

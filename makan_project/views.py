@@ -76,3 +76,7 @@ def home(request):
         'all_notifications': all_notifications,
     })
 
+
+def about(request):
+    return render(request,'about.html')
+
