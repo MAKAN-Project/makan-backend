@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="fw-bold text-primary mb-4">Project Details</h2>
+
+  <div class="card shadow-sm p-4 mb-4">
+    <h4>#{{ project.request_id }}</h4>
+    <p><strong>Description:</strong> {{ project.description }}</p>
+    <p><strong>Status:</strong> {{ project.get_status_display }}</p>
+    <p><strong>Engineer:</strong> {{ project.engineer.user.first_name }} {{ project.engineer.user.last_name }}</p>
+    <p><strong>Created:</strong> {{ project.created_at|date:"M d, Y - H:i" }}</p>
+  </div>
+
+  <h4 class="mb-3">Files</h4>
+  <div class="row">
+    {% for file in files %}
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          {% if file.file.url %}
+           {% if file.file.url|lower|slice:"-4:" == ".jpg" or file.file.url|lower|slice:"-5:" == ".jpeg" or file.file.url|lower|slice:"-4:" == ".png" %}
+    <img src="{{ file.file.url }}" class="card-img-top" alt="{{ file.file_name }}">
+{% else %}
+    <p class="text-center mt-3">📄 {{ file.file_name }}</p>
+    <a href="{{ file.file.url }}" class="btn btn-primary btn-sm mb-3">Download</a>
+{% endif %}
+
+          {% else %}
+            <p class="text-muted">No file available</p>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p>No files uploaded for this project.</p>
+    {% endfor %}
+  </div>
+
+  <a href="{% url 'customer_dashboard' %}" class="btn btn-outline-primary mt-4">← Back to My Projects</a>
+</div>
+{% endblock %}

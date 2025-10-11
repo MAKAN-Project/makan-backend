@@ -17,7 +17,9 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from notifications.utils import create_notification
 from engineers.models import EngineerAvailability
-
+from django.db.models import Q
+from models3d.models import Model3D
+from datetime import date
 def reschedule_session(request, session_id):
     if request.method == 'POST':
         new_date = request.POST.get('date')
@@ -145,7 +147,7 @@ def reserve_session(request):
             sender=client,                  # العميل المرسل
             project_request=project_request,
             type='project_request',         # مطابق للـ choices
-            message=f"طلب جديد من {client.first_name} {client.last_name} بخصوص '{project_request.description[:30]}...'."
+            message=f"New Request {client.first_name} {client.last_name} About '{project_request.description[:30]}...'."
         )
 
         # ✅ حفظ الملفات
@@ -173,7 +175,7 @@ def reserve_session(request):
         slot.is_booked = True
         slot.save()
 
-        messages.success(request, "✅ تم إرسال طلب الجلسة والمشروع بنجاح.")
+        messages.success(request, "✅ Send project Request Succesfuly.")
         return redirect('engineer_details', eng_id=engineer_id)
 
     return render(request, 'engineer_details.html', {
@@ -202,31 +204,41 @@ def logout_user(request):
 
 # --- Customer Files Page ---
 def customer_files(request):
-    from files.models import File
-    from airequests.models import AIRequest
     user_id = request.session.get('user_id')
-    user_images = []
-    # Get File model images uploaded by user
-    file_images = File.objects.filter(user_id=user_id, type__icontains='image')
-    for f in file_images:
-        user_images.append({'url': f.path, 'name': f.file_name})
+    if not user_id:
+        messages.error(request, "Please log in first.")
+        return redirect('login_register')
 
-    # Get images from AIRequest (input and output images)
-    ai_images = AIRequest.objects.filter(user_id=user_id)
-    for req in ai_images:
-        if req.input_image_path:
-            user_images.append({'url': req.input_image_path, 'name': 'AI Input'})
-        if req.output_images_paths:
-            # If multiple output images, split by comma
-            for out_img in req.output_images_paths.split(','):
-                user_images.append({'url': out_img.strip(), 'name': 'AI Output'})
+    # Fetch user files
+    files = File.objects.filter(user_id=user_id).order_by('-created_at')
 
-    # TODO: Populate engineer_images, engineer_pdfs, engineer_cad_files from File model (received files)
+    # Split by type for clarity
+    image_extensions = ['jpg', 'jpeg', 'png', 'gif']
+    pdf_extensions = ['pdf']
+    cad_extensions = ['dwg', 'dxf']
+
+    image_files = []
+    pdf_files = []
+    cad_files = []
+    other_files = []
+
+    for f in files:
+        ext = f.file_name.split('.')[-1].lower()
+        file_data = {'url': f.file.name, 'name': f.file_name, 'type': f.type, 'status': f.status}
+        if ext in image_extensions:
+            image_files.append(file_data)
+        elif ext in pdf_extensions:
+            pdf_files.append(file_data)
+        elif ext in cad_extensions:
+            cad_files.append(file_data)
+        else:
+            other_files.append(file_data)
+
     context = {
-        'user_uploaded_images': user_images,
-        'engineer_images': [],
-        'engineer_pdfs': [],
-        'engineer_cad_files': [],
+        'image_files': image_files,
+        'pdf_files': pdf_files,
+        'cad_files': cad_files,
+        'other_files': other_files,
     }
     return render(request, 'customer_files.html', context)
 
@@ -292,84 +304,63 @@ def login_user(request):
     return redirect('login_register')
 
 def customer_dashboard(request):
-    # تحقق إذا المستخدم مسجل دخول
+    # --- تحقق من المستخدم ---
     if 'user_id' not in request.session:
-        messages.error(request, "Please log in first")
+        messages.error(request, "Please log in first.")
         return redirect('login_register')
-    
-    # تحقق إذا المستخدم customer
+
     if request.session.get('role') != 'customer':
-        messages.error(request, "Access denied")
+        messages.error(request, "Access denied.")
         return redirect('home')
-    
+
     user_id = request.session['user_id']
-    
-    try:
-        user = User.objects.get(user_id=user_id)
-    except User.DoesNotExist:
-        messages.error(request, "User not found")
-        return redirect('login_register')
-    
-    # جلب البيانات المطلوبة
-    ai_requests = AIRequest.objects.filter(user_id=user_id).order_by('-created_at')
-    
-    # الجلسات القادمة
-    from datetime import datetime
-    upcoming_sessions = Session.objects.filter(
+    user = User.objects.get(user_id=user_id)
+
+    # --- بيانات الإشعارات ---
+    notifications = Notification.objects.filter(
+        recipient=user
+    ).order_by('-created_at')[:5]
+
+    # --- جلسات اليوم ---
+    today_sessions = Session.objects.filter(
         user_id=user_id,
-        scheduled_at__gte=datetime.now(),
-        status='approved'
-    ).order_by('scheduled_at')[:3]
-    
-    # جلب 3D models
-    from models3d.models import Model3D
+        scheduled_at__date=date.today()
+    ).order_by('scheduled_at')
+
+    # --- المشاريع ---
+    project_requests = ProjectRequest.objects.filter(
+        client=user
+    ).order_by('-created_at')[:5]
+
+    # --- الطلبات من الذكاء الصناعي ---
+    ai_requests = AIRequest.objects.filter(
+        user_id=user_id
+    ).order_by('-created_at')[:5]
+
+    # --- نماذج 3D ---
     user_3d_models = Model3D.objects.filter(user_id=user_id)
-    
 
-    from .forms import ReserveConsultingSessionForm, UploadRoomPhotoForm, CreateBuildingProjectForm
-    # Get all approved engineers
-    engineer_qs = Engineer.objects.filter(status="approved")
-    # Example: Use education field as type (customize as needed)
-    engineer_types = sorted(set(e.education for e in engineer_qs if e.education))
-    engineer_type_choices = [(et, et) for et in engineer_types]
-    engineer_choices = [(e.eng_id, f"{e.user.first_name} {e.user.last_name}") for e in engineer_qs]
-    reserve_consulting_session_form = ReserveConsultingSessionForm()
-    reserve_consulting_session_form.fields['engineer_type'].choices = engineer_type_choices
-    reserve_consulting_session_form.fields['engineer_id'].choices = engineer_choices
-    upload_room_photo_form = UploadRoomPhotoForm()
-    create_building_project_form = CreateBuildingProjectForm()
-    user_id = request.session.get('user_id')
-    if not user_id:
-        messages.error(request, "Please log in first")
-        return redirect('login_register')
+    # --- الإحصائيات ---
+    stats = {
+        'total_requests': ProjectRequest.objects.filter(client=user).count(),
+        'completed_projects': ProjectRequest.objects.filter(client=user, status='completed').count(),
+        'total_sessions': Session.objects.filter(user_id=user_id).count(),
+        'pending_sessions': Session.objects.filter(user_id=user_id, status='pending').count(),
+        'notifications_count': notifications.count(),
+    }
 
-
-    pending_notifications = Notification.objects.filter(
-            recipient=user,
-            is_read=False
-        ).order_by('-created_at')
-
-    all_notifications = Notification.objects.filter(
-            recipient=user
-        ).order_by('-created_at')
-
+    # --- تمرير البيانات إلى القالب ---
     context = {
-    'user': user,
-    'engineers': Engineer.objects.filter(status="approved"),
-    'recent_ai_requests': ai_requests[:5],
-    'upcoming_sessions': upcoming_sessions,
-    'total_requests': ai_requests.count(),
-    'pending_requests': 0,  
-    'total_sessions': Session.objects.filter(user_id=user_id).count(),
-    'total_3d_models': user_3d_models.count(),
-    'reserve_consulting_session_form': reserve_consulting_session_form,
-    'upload_room_photo_form': upload_room_photo_form,
-    'create_building_project_form': create_building_project_form,
-    'pending_notifications': pending_notifications,
-    'all_notifications': all_notifications,
-}
-    return render(request, "customer_dashboard.html", context)
+        'user': user,
+        'notifications': notifications,
+        'today_sessions': today_sessions,
+        'project_requests': project_requests,
+        'ai_requests': ai_requests,
+        'user_3d_models': user_3d_models,
+        'stats': stats,
+    }
 
+    return render(request, 'customer_dashboard.html', context)
 def engineer_details(request, eng_id):
     engineer = get_object_or_404(Engineer, pk=eng_id)
     
@@ -425,3 +416,83 @@ def engineer_details(request, eng_id):
     }
 
     return render(request, 'engineer_details.html', context)
+
+
+def customer_ai_requests(request):
+    ai_requests = AIRequest.objects.filter(user_id=request.session.get('user_id')).order_by('-created_at')
+    return render(request, 'ai_requests.html', {'ai_requests': ai_requests})
+
+
+def customer_sessions(request):
+    q = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status")
+
+    # جلب كل الجلسات من قاعدة البيانات
+    sessions_qs = Session.objects.select_related("eng__user", "user").order_by('-scheduled_at')
+
+    # إذا المستخدم الحالي هو "customer" (عميل)
+    user_id = request.session.get('user_id')
+    if user_id and request.session.get('role') == 'customer':
+        # نعرض فقط الجلسات الخاصة فيه
+        sessions_qs = sessions_qs.filter(user__user_id=user_id)
+
+    # البحث بالاسم (اسم المهندس أو العميل)
+    if q:
+        sessions_qs = sessions_qs.filter(
+            Q(eng__user__first_name__icontains=q) |
+            Q(eng__user__last_name__icontains=q) |
+            Q(user__first_name__icontains=q) |
+            Q(user__last_name__icontains=q)
+        )
+
+    # الفلترة حسب الحالة (status)
+    if status_filter:
+        sessions_qs = sessions_qs.filter(status=status_filter)
+
+    # تمرير البيانات للقالب
+    context = {
+        "sessions": sessions_qs,
+        "status_choices": Session.STATUS_CHOICES,
+    }
+    return render(request, "sessions.html", context)
+
+
+def customer_3d_models(request):
+    from models3d.models import Model3D
+    models = Model3D.objects.filter(user_id=request.session.get('user_id'))
+    return render(request, 'customer_3d_models.html', {'models': models})
+
+
+def customer_profile(request):
+    user = User.objects.get(user_id=request.session.get('user_id'))
+    return render(request, 'customer_profile.html', {'user': user})
+def customer_projects(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login_register')
+
+    user = User.objects.get(user_id=user_id)
+    projects = ProjectRequest.objects.filter(client=user).order_by('-created_at')
+    
+    context = {'projects': projects}
+    return render(request, 'customer_projects.html', context)
+
+
+def customer_project_details(request, request_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login_register')
+
+    user = User.objects.get(user_id=user_id)
+
+    try:
+        project = ProjectRequest.objects.get(request_id=request_id, client=user)
+        files = File.objects.filter(project_request=project)
+    except ProjectRequest.DoesNotExist:
+        return render(request, '404.html', {'message': 'Project not found.'})
+
+    context = {
+        'project': project,
+        'files': files
+    }
+    return render(request, 'customer_project_detail.html', context)
