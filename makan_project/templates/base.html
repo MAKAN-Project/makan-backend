@@ -12,17 +12,29 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="stylesheet" href="{% static 'css/override.css' %}">
+  
 
   {% block extra_head %}{% endblock %}
 </head>
+
 <body>
+<style>
+.notification-message a {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+}
+.notification-message a:hover {
+  text-decoration: underline;
+}
+</style>
 
 <!-- ===== NAVBAR ===== -->
 <nav id="mainNavbar" class="navbar navbar-expand-lg fixed-top shadow-sm py-3">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-      <img id="siteLogo" src="{% static 'images/logo.png' %}" alt="MAKAN Logo" class="me-2"
+      <img id="siteLogo" src="{% static 'images/logo2.png' %}" alt="MAKAN Logo" class="me-2"
            data-light-src="{% static 'images/logo.png' %}"
            data-dark-src="{% static 'images/logo-dark.png' %}">
     </a>
@@ -33,73 +45,80 @@
 
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-        <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Projects</a></li>
-        <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Engineers</a></li>
-        <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">AI Studio</a></li>
-        <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'home' %}">Home</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Projects</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Engineers</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">AI Studio</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
 
-        <!-- Notifications -->
-        <li class="nav-item dropdown ms-lg-3">
-          <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown">
-            <i class="bi bi-bell fs-5"></i>
-            {% if pending_notifications %}
-              <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
-                {{ pending_notifications|length }}
-              </span>
+  {% if request.session.user_id %}
+    <!-- Notifications -->
+    <li class="nav-item dropdown ms-lg-3">
+      <button class="btn btn-light position-relative rounded-circle p-2" id="notifBtn" data-bs-toggle="dropdown">
+        <i class="bi bi-bell fs-5"></i>
+        {% if pending_notifications %}
+          <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+            {{ pending_notifications|length }}
+          </span>
+        {% endif %}
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
+        {% if pending_notifications %}
+          {% for notif in pending_notifications %}
+          <li class="p-3 border-bottom d-flex justify-content-between align-items-start {% if not notif.is_read %}bg-light{% endif %}"
+              data-id="{{ notif.id }}">
+            <div>
+              <div class="mb-1 notification-message" style="white-space: pre-line;">{{ notif.message|safe }}</div>
+              <small class="text-muted">
+                {% if notif.sender %}FROM {{ notif.sender.first_name }}{% else %}System{% endif %}
+                • {{ notif.created_at|date:"Y-m-d H:i" }}
+              </small>
+            </div>
+
+            {% if notif.project_request %}
+            <button
+              class="btn btn-sm btn-outline-primary view-request-btn"
+              data-notif-id="{{ notif.id }}"
+              data-bs-toggle="modal"
+              data-bs-target="#requestModal"
+              data-request-id="{{ notif.project_request.request_id }}"
+              data-description="{{ notif.project_request.description|escape }}"
+              data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
+              data-accept-url="{% url 'accept_project_request' notif.project_request.request_id %}"
+              data-reject-url="{% url 'reject_project_request' notif.project_request.request_id %}">
+              View
+            </button>
             {% endif %}
-          </button>
-
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifBtn" style="min-width: 300px;">
-            {% if pending_notifications %}
-              {% for notif in pending_notifications %}
-                <li class="p-3 border-bottom d-flex justify-content-between align-items-start {% if not notif.is_read %}bg-light{% endif %}"
-                    data-id="{{ notif.id }}">
-                  <div>
-                    <div class="mb-1 notification-message" style="white-space: pre-line;">{{ notif.message|safe }}</div>
-
-
-                    <small class="text-muted">
-                      {% if notif.sender %} FROM {{ notif.sender.first_name }}{% else %}System{% endif %}
-                      • {{ notif.created_at|date:"Y-m-d H:i" }}
-                    </small>
-                  </div>
-
-                  {% if notif.project_request %}
-                    <button
-                      class="btn btn-sm btn-outline-primary view-request-btn"
-                      data-notif-id="{{ notif.id }}"
-                      data-bs-toggle="modal"
-                      data-bs-target="#requestModal"
-                      data-request-id="{{ notif.project_request.request_id }}"
-                      data-description="{{ notif.project_request.description|escape }}"
-                      data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
-                      data-accept-url="{% url 'accept_project_request' notif.project_request.request_id %}"
-                      data-reject-url="{% url 'reject_project_request' notif.project_request.request_id %}"
-                      {% with files=notif.project_request.files.all %}
-                        {% if files|length %}
-                          data-file-url="{{ files.0.file.url }}"
-                          data-file-name="{{ files.0.file_name|escape }}"
-                        {% endif %}
-                      {% endwith %}
-                      {% if notif.project_request.session %}
-                        data-zoom-link="{{ notif.project_request.session.meeting_link }}"
-                      {% endif %}
-                    >View</button>
-                  {% endif %}
-                </li>
-              {% endfor %}
-              <li>
-                <a href="#" class="dropdown-item text-center" data-bs-toggle="modal" data-bs-target="#allNotificationsModal">
-                  View All
-                </a>
-              </li>
-            {% else %}
-              <li class="p-3 text-center text-muted">No new notifications</li>
-            {% endif %}
-          </ul>
-        </li>
+          </li>
+          {% endfor %}
+          <li><a href="{% url 'notifications_page' %}" class="dropdown-item text-center">View All</a></li>
+        {% else %}
+          <li class="p-3 text-center text-muted">No new notifications</li>
+        {% endif %}
       </ul>
+    </li>
+
+    <!-- Logout Button -->
+    <li class="nav-item ms-lg-3">
+      <form action="{% url 'logout_user' %}" method="POST" class="d-inline">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold">
+    <i class="bi bi-box-arrow-right me-1"></i> Logout
+  </button>
+</form>
+    </li>
+
+  {% else %}
+    <!-- Login/Register Button -->
+    <li class="nav-item ms-lg-3">
+      <a href="{% url 'login_register' %}" class="btn btn-warning rounded-pill px-4 fw-semibold">
+        <i class="bi bi-person-circle me-1"></i> Login / Register
+      </a>
+    </li>
+  {% endif %}
+</ul>
+
     </div>
   </div>
 </nav>
@@ -111,13 +130,12 @@
       <form method="POST" id="requestActionForm">{% csrf_token %}
         <div class="modal-header bg-primary text-light rounded-top">
           <h5 class="modal-title">Project Request Details</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
           <p><strong>Client:</strong> <span id="modalClient"></span></p>
           <p><strong>Request ID:</strong> <span id="modalRequestId"></span></p>
-
           <div class="mb-3">
             <strong>Description:</strong>
             <div id="modalDescription" class="p-3 bg-light rounded"></div>
@@ -128,7 +146,6 @@
             <p id="modalFile"></p>
           </div>
 
-          <!-- ✅ Zoom Meeting Link -->
           <div id="modalZoomContainer" class="mt-3 d-none">
             <strong>Zoom Meeting Link:</strong>
             <div class="alert alert-info mt-2">
@@ -158,32 +175,94 @@
   {% block content %}{% endblock %}
 </main>
 
-<footer class="site-footer">
-  <div class="container py-5 text-center">
-    <p class="mb-0">&copy; 2025 <span class="text-accent">MAKAN</span>. All Rights Reserved.</p>
-  </div>
-</footer>
+  <footer class="footer">
+    <div class="container py-5">
+      <div class="row gy-4"> <!-- Logo & About -->
+        <div class="col-md-4"> <a href="home.html">
+            <h2 class="footer-brand mb-3">MAKAN</h2>
+          </a>
+          <p class="footer-text"> MAKAN is a platform connecting clients with professional engineers, providing
+            innovative architecture and interior design solutions powered by AI and 3D technology. </p>
+        </div> <!-- Quick Links -->
+        <div class="col-md-4">
+          <h5 class="footer-title">Quick Links</h5>
+          <ul class="footer-links list-unstyled">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Our Services</a></li>
+            <li><a href="#">Portfolio</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div> <!-- Contact & Social -->
+        <div class="col-md-4">
+          <h5 class="footer-title">Contact</h5>
+          <p class="footer-text mb-2">📧 info@makan.com</p>
+          <p class="footer-text mb-4">📞 +972 599 000 000</p>
+          <div class="social-icons"> <a href="#"><i class="bi bi-facebook"></i></a> <a href="#"><i
+                class="bi bi-instagram"></i></a> <a href="#"><i class="bi bi-linkedin"></i></a> <a href="#"><i
+                class="bi bi-twitter"></i></a> </div>
+        </div>
+      </div>
+      <hr class="footer-divider my-2">
+      <div class="text-center footer-bottom">
+        <p class="mb-0">&copy; 2025 <span class="text-accent">MAKAN</span>. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer> <!-- Initialize Swiper -->
 
 <!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const notifBadge = document.getElementById('notifBadge');
+  const notifBtn = document.getElementById('notifBtn');
 
-  function markAsRead(notifId, liElement) {
-    if (!notifId) return;
-    fetch(`/notifications/read/${notifId}/`).then(() => {
-      if (liElement) liElement.classList.remove('bg-light');
-      if (notifBadge) {
-        let count = parseInt(notifBadge.textContent || '0', 10);
-        if (!isNaN(count) && count > 0) {
-          count = Math.max(0, count - 1);
-          if (count === 0) notifBadge.remove();
-          else notifBadge.textContent = count;
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
       }
-    }).catch(console.error);
+    }
+    return cookieValue;
+  }
+
+  function markAsRead(notifId, liElement) {
+    fetch(`/notifications/${notifId}/read/`, {
+      method: 'PATCH',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        if (liElement) liElement.classList.remove('bg-light');
+        updateBadge(-1);
+      }
+    }).catch(err => console.error('Error marking notification as read:', err));
+  }
+
+  function updateBadge(change) {
+    let badge = document.getElementById('notifBadge');
+    if (!badge && change > 0) {
+      badge = document.createElement('span');
+      badge.id = 'notifBadge';
+      badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light';
+      badge.textContent = change;
+      notifBtn.appendChild(badge);
+      return;
+    }
+    if (badge) {
+      let count = parseInt(badge.textContent || '0', 10) + change;
+      if (count <= 0) badge.remove();
+      else badge.textContent = count;
+    }
   }
 
   function initViewButtons() {
@@ -194,52 +273,62 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const notifId = btn.dataset.notifId;
-        const requestId = btn.dataset.requestId;
-        const description = btn.dataset.description || '';
-        const client = btn.dataset.client || '';
-        const fileUrl = btn.dataset.fileUrl || '';
-        const fileName = btn.dataset.fileName || '';
-        const zoomLink = btn.dataset.zoomLink || '';
-        const acceptUrl = btn.dataset.acceptUrl || '';
-        const rejectUrl = btn.dataset.rejectUrl || '';
+        const li = btn.closest('li[data-id]');
+        markAsRead(notifId, li);
 
-        const parentLi = btn.closest('li[data-id]');
-        markAsRead(notifId, parentLi);
+        // تعبئة المودال
+        document.getElementById('modalClient').textContent = btn.dataset.client;
+        document.getElementById('modalRequestId').textContent = btn.dataset.requestId;
+        document.getElementById('modalDescription').textContent = btn.dataset.description;
+        document.getElementById('acceptBtn').setAttribute('formaction', btn.dataset.acceptUrl);
+        document.getElementById('rejectBtn').setAttribute('formaction', btn.dataset.rejectUrl);
 
-        document.getElementById('modalRequestId').textContent = requestId;
-        document.getElementById('modalDescription').textContent = description;
-        document.getElementById('modalClient').textContent = client;
-
-        // File
         const fileContainer = document.getElementById('modalFileContainer');
-        const fileElement = document.getElementById('modalFile');
-        if (fileUrl) {
+        if (btn.dataset.fileUrl) {
           fileContainer.classList.remove('d-none');
-          fileElement.innerHTML = `<a href="${fileUrl}" target="_blank">${fileName || 'View File'}</a>`;
+          document.getElementById('modalFile').innerHTML =
+            `<a href="${btn.dataset.fileUrl}" target="_blank">${btn.dataset.fileName}</a>`;
         } else {
           fileContainer.classList.add('d-none');
-          fileElement.innerHTML = '';
         }
 
-        // ✅ Zoom link
         const zoomContainer = document.getElementById('modalZoomContainer');
-        const zoomAnchor = document.getElementById('modalZoomLink');
-        if (zoomLink) {
+        if (btn.dataset.zoomLink) {
           zoomContainer.classList.remove('d-none');
-          zoomAnchor.href = zoomLink;
+          document.getElementById('modalZoomLink').setAttribute('href', btn.dataset.zoomLink);
         } else {
           zoomContainer.classList.add('d-none');
-          zoomAnchor.href = '#';
         }
-
-        // Buttons
-        const acceptBtn = document.getElementById('acceptBtn');
-        const rejectBtn = document.getElementById('rejectBtn');
-        if (acceptBtn && acceptUrl) acceptBtn.setAttribute('formaction', acceptUrl);
-        if (rejectBtn && rejectUrl) rejectBtn.setAttribute('formaction', rejectUrl);
       });
     });
   }
+
+  // عند الضغط على الإشعار نفسه
+  document.querySelectorAll('.dropdown-menu .border-bottom[data-id]').forEach(li => {
+    li.addEventListener('click', () => markAsRead(li.dataset.id, li));
+  });
+
+  // تحديث العدد كل 10 ثوانٍ
+  setInterval(() => {
+    fetch("/notifications/unread_count/")
+      .then(res => res.json())
+      .then(data => {
+        let badge = document.getElementById('notifBadge');
+        if (data.count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.id = 'notifBadge';
+            badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light';
+            badge.textContent = data.count;
+            notifBtn.appendChild(badge);
+          } else {
+            badge.textContent = data.count;
+          }
+        } else if (badge) {
+          badge.remove();
+        }
+      });
+  }, 10000);
 
   initViewButtons();
 });

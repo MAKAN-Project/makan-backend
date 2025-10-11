@@ -15,6 +15,10 @@ urlpatterns = [
     path('choose-building-stage/', views.choose_building_stage, name='choose_building_stage'),
     path('engineering-fields/<str:stage>/', views.engineering_fields, name='engineering_fields'),
     path('engineer/<int:eng_id>/', views.engineer_details, name='engineer_details'),
+    path('customer/ai-requests/', views.customer_ai_requests, name='customer_ai_requests'),
+    path('customer/sessions/', views.customer_sessions, name='customer_sessions'),
+    path('customer/3d-models/', views.customer_3d_models, name='customer_3d_models'),
+    path('customer/profile/', views.customer_profile, name='customer_profile'),
     
     # path('back-to-scratch/', views.back_to_scratch, name='back_to_scratch')
 ]

@@ -8,7 +8,7 @@
 /* Force navbar to our navy palette (override theme gradients) */
 #mainNavbar.navbar,
 .navbar {
-  background: linear-gradient(180deg, var(--makan-primary), #08243a) !important;
+  background: linear-gradient(to bottom, #1c2431 0%, #1c2431 100%);
   color: white !important;
   box-shadow: 0 6px 18px rgba(15,44,77,0.12) !important;
 }
@@ -192,4 +192,24 @@ footer.site-footer {
 .footer-links a:hover::before {
   color: #fff;
   transform: translateY(-50%) translateX(5px);
+}
+.footer{
+  background: linear-gradient(to bottom, #1c2431 0%, #1c2431 100%);
+}
+/* Force MAKAN gradient buttons to override Bootstrap and overrides */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:hover {
+  background: linear-gradient(90deg, var(--makan-info), var(--makan-accent)) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(15, 44, 77, 0.1);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(15, 44, 77, 0.15);
 }

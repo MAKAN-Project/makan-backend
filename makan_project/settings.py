@@ -214,3 +214,15 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'error',
 }
+DEEPAI_API_KEY = "fbea3809-85f0-43ad-bd11-eb66ba88e669"
+
+MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB كحد أقصى لكل ملف
+
+ALLOWED_FILE_EXTENSIONS = [
+    # 🧱 ملفات 3D
+    '.stl', '.obj', '.glb', '.gltf',
+    # 📐 ملفات CAD
+    '.dwg', '.dxf',
+    # 📎 ملفات شائعة أخرى
+    '.pdf', '.jpg', '.jpeg', '.png', '.zip'
+]

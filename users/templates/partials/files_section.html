@@ -1,0 +1,30 @@
+{% if files %}
+  <div class="row g-4">
+    {% for f in files %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card file-card shadow-sm h-100 border-{{ color }}">
+          
+          {% if ".jpg" in f.url|lower or ".png" in f.url|lower or ".jpeg" in f.url|lower %}
+            <img src="/media/{{ f.url }}" alt="{{ f.name }}">
+          {% else %}
+            <div class="p-5 text-center text-{{ color }}">
+              📄 {{ f.type|title }}
+            </div>
+          {% endif %}
+
+          <div class="card-body text-center">
+            <h6 class="fw-bold text-truncate" title="{{ f.name }}">{{ f.name }}</h6>
+            <div class="d-flex justify-content-between gap-2">
+              <a href="/media/{{ f.url }}" target="_blank" class="btn btn-sm btn-outline-{{ color }} flex-fill">🔗 View</a>
+              <a href="/media/{{ f.url }}" download class="btn btn-sm btn-outline-{{ color }} flex-fill">⬇️ Download</a>
+              <button onclick="copyLink('{{ f.url }}')" class="btn btn-sm btn-outline-secondary flex-fill">📋 Copy</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-center text-muted py-5">No files in this category.</p>
+{% endif %}
