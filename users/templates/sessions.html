@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sessions - MAKAN{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">📅 Sessions</h2>
+    <a href="{% url 'customer_sessions' %}" class="btn btn-outline-secondary">Refresh</a>
+  </div>
+
+  <!-- Filter & Search -->
+  <form method="get" class="row g-3 align-items-center mb-4">
+    <div class="col-md-4">
+      <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search by engineer or user...">
+    </div>
+    <div class="col-md-3">
+      <select name="status" class="form-select">
+        <option value="">All statuses</option>
+        {% for key, label in status_choices %}
+          <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  {% if sessions %}
+    <div class="row g-4">
+      {% for session in sessions %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Session #{{ session.session_id }}</span>
+              <span class="badge 
+                {% if session.status == 'pending' %}bg-secondary
+                {% elif session.status == 'scheduled' %}bg-primary
+                {% elif session.status == 'in_progress' %}bg-warning text-dark
+                {% elif session.status == 'approved' %}bg-success
+                {% elif session.status == 'completed' %}bg-success
+                {% elif session.status == 'reschedule_requested' or session.status == 'reschedule_pending' %}bg-info text-dark
+                {% elif session.status == 'cancelled' %}bg-danger
+                {% else %}bg-secondary
+                {% endif %}
+              ">
+                {{ session.get_status_display }}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <p class="mb-1"><strong>Engineer:</strong> {{ session.eng.user.first_name }} {{ session.eng.user.last_name }}</p>
+              <p class="mb-1"><strong>User:</strong> {{ session.user.first_name }} {{ session.user.last_name }}</p>
+              <p class="mb-1"><strong>Scheduled at:</strong> {{ session.scheduled_at|date:"Y-m-d H:i" }}</p>
+              {% if session.old_scheduled_at %}
+                <p class="mb-1 text-warning"><strong>Previous date:</strong> {{ session.old_scheduled_at|date:"Y-m-d H:i" }}</p>
+              {% endif %}
+            </div>
+
+            {% if session.meeting_link or session.host_link %}
+              <div class="card-footer d-flex gap-2">
+                {% if session.meeting_link %}
+                  <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-outline-primary btn-sm flex-fill">Join Now</a>
+                {% endif %}
+                
+              </div>
+            {% endif %}
+
+            <div class="card-footer text-muted small">
+              Updated: {{ session.updated_at|date:"Y-m-d H:i" }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-muted mt-5">No sessions found.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

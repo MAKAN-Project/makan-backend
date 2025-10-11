@@ -3,152 +3,128 @@
 {% block title %}Customer Dashboard - MAKAN{% endblock %}
 
 {% block content %}
-<style>
-  .notification-message a {
-  color: #0d6efd;
-  text-decoration: none;
-  font-weight: 500;
-  word-break: break-all;
-}
+{% load static %}
+<link rel="stylesheet" href="{% static 'style/style.css' %}">
 
-.notification-message a:hover {
-  text-decoration: underline;
-}
 
-</style>
+
 <div class="container-fluid">
-    <div class="row">
-    
-  <!-- Sidebar -->
-  <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-            <div class="position-sticky pt-3">
-                <h5 class="sidebar-heading px-3 mt-4 mb-1 text-muted">Customer Dashboard</h5>
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <div class="position-sticky">
+        <h5 class="sidebar-heading px-2 mt-2 mb-3">Customer Dashboard</h5>
         <ul class="nav flex-column">
-      <li class="nav-item"><a class="nav-link active" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">My AI Requests</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">My Sessions</a></li>
-    <li class="nav-item"><a class="nav-link" href="{% url 'customer_files' %}">My Files</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">3D Models</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+         <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
+  <li class="nav-item"><a class="nav-link" href="#">My AI Requests</a></li>
+  <li class="nav-item"><a class="nav-link" href="#">My Sessions</a></li>
+  <li class="nav-item"><a class="nav-link" href="#">My Files</a></li>
+  <li class="nav-item"><a class="nav-link" href="#">3D Models</a></li>
+  <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
         </ul>
-            </div>
-        </nav>
+      </div>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <!-- Main content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 
-        <!-- Welcome Header -->
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Welcome, {{ request.session.first_name }}!</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="#" class="btn btn-primary me-2">
-                <i class="bi bi-plus-circle"></i> New AI Request
-            </a>
-        </div>
+      <!-- Header -->
+      <div class="d-flex justify-content-between flex-wrap align-items-center border-bottom pb-3 mb-4">
+        <h1 class="h3 fw-bold text-primary">Welcome, {{ request.session.first_name }}!</h1>
+        <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> New AI Request</a>
       </div>
 
       <!-- Notifications -->
-{% if notifications %}
-  <div class="alert alert-info">
-    <h5>Notifications</h5>
-    <ul class="mb-0">
-      {% for note in notifications %}
-        <li>
-          {{ note.message }} <small class="text-muted">({{ note.created_at|timesince }} ago)</small>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endif %}
-
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'style/style.css' %}">
-
-        <!-- Visible Choose Your Building Stage Section -->
-        <div class="card mb-4">
-          <div class="card-header bg-primary text-white">
-            <h4 class="fw-bold mb-0">
-              <i class="bi bi-house-door me-2"></i> Choose Your Building Stage
-            </h4>
-          </div>
-          <div class="card-body py-4">
-            <div class="row g-4 justify-content-center">
-              <div class="col-12 mb-3 text-center">
-                <p class="lead">Select the stage that best matches your project. Each option will show you the engineering fields and experts you need.</p>
-              </div>
-              <div class="col-md-6 col-lg-3">
-                <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                  <div class="card-body text-center">
-                    <i class="bi bi-tree display-4 mb-2 text-success"></i>
-                    <h5 class="card-title">Build from Scratch</h5>
-                    <p class="card-text small">Start with an empty land and build your dream home.</p>
-                  </div>
-                </a>
-              </div>
-              <div class="col-md-6 col-lg-3">
-                <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                  <div class="card-body text-center">
-                    <i class="bi bi-building display-4 mb-2 text-info"></i>
-                    <h5 class="card-title">Empty Apartment/House</h5>
-                    <p class="card-text small">You have an empty apartment or house ready for work.</p>
-                  </div>
-                </a>
-              </div>
-              <div class="col-md-6 col-lg-3">
-                <a href="{% url 'engineering_fields' stage='decorate' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                  <div class="card-body text-center">
-                    <i class="bi bi-palette display-4 mb-2 text-danger"></i>
-                    <h5 class="card-title">Decorate / Redecorate</h5>
-                    <p class="card-text small">Decorate a ready apartment/house or redecorate your space.</p>
-                  </div>
-                </a>
-              </div>
-              <div class="col-md-6 col-lg-3">
-                <a href="{% url 'engineering_fields' stage='3d_furniture' %}" class="card building-stage-card text-decoration-none text-dark h-100">
-                  <div class="card-body text-center">
-                    <i class="bi bi-cube display-4 mb-2 text-primary"></i>
-                    <h5 class="card-title">3D Furniture</h5>
-                    <p class="card-text small">Visualize and add 3D furniture to your space for a realistic preview.</p>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
+      {% if notifications %}
+        <div class="alert alert-info shadow-sm">
+          <h5>Notifications</h5>
+          <ul class="mb-0">
+            {% for note in notifications %}
+              <li>
+                {{ note.message }}
+                <small class="text-muted">({{ note.created_at|timesince }} ago)</small>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
+      {% endif %}
 
-        
-
-      
-
-      <!-- Service Overview Cards -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card text-center shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">Total Requests</h5>
-              <p class="card-text display-6">{{ total_requests }}</p>
-            </div>
-          </div>
+      <!-- Building Stage -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-house-door me-2"></i> Choose Your Building Stage</h5>
         </div>
-        <div class="col-md-3">
-          <div class="card text-center shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">Total Sessions</h5>
-              <p class="card-text display-6">{{ total_sessions }}</p>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+              <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card text-center text-decoration-none text-dark h-100">
+                <div class="card-body">
+                  <i class="bi bi-tree display-5 text-success mb-2"></i>
+                  <h6>Build from Scratch</h6>
+                  <p class="small text-muted">Start with an empty land and build your dream home.</p>
+                </div>
+              </a>
             </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card text-center shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">3D Models</h5>
-              <p class="card-text display-6">{{ total_3d_models }}</p>
+            <div class="col-md-6 col-lg-3">
+              <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card text-center text-decoration-none text-dark h-100">
+                <div class="card-body">
+                  <i class="bi bi-building display-5 text-info mb-2"></i>
+                  <h6>Empty Apartment/House</h6>
+                  <p class="small text-muted">You have an empty apartment or house ready for work.</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+              <a href="{% url 'engineering_fields' stage='decorate' %}" class="card text-center text-decoration-none text-dark h-100">
+                <div class="card-body">
+                  <i class="bi bi-palette display-5 text-danger mb-2"></i>
+                  <h6>Decorate / Redecorate</h6>
+                  <p class="small text-muted">Decorate or redecorate your existing space.</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+              <a href="{% url 'engineering_fields' stage='3d_furniture' %}" class="card text-center text-decoration-none text-dark h-100">
+                <div class="card-body">
+                  <i class="bi bi-cube display-5 text-primary mb-2"></i>
+                  <h6>3D Furniture</h6>
+                  <p class="small text-muted">Visualize furniture in 3D for realistic previews.</p>
+                </div>
+              </a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Recent AI Requests -->
+      <!-- Stats -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+              <h6 class="text-muted">Total Requests</h6>
+              <p class="display-6 fw-bold text-primary">{{ total_requests }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+              <h6 class="text-muted">Total Sessions</h6>
+              <p class="display-6 fw-bold text-primary">{{ total_sessions }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-0">
+            <div class="card-body">
+              <h6 class="text-muted">3D Models</h6>
+              <p class="display-6 fw-bold text-primary">{{ total_3d_models }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Requests -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">Recent AI Requests</h5>
@@ -156,22 +132,18 @@
         </div>
         <div class="card-body">
           {% for request in recent_ai_requests %}
-          <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-            <div>
-              <h6 class="mb-1">AI Design Request #{{ request.ai_request_id }}</h6>
-              <p class="text-muted mb-1">Style: {{ request.style }}</p>
-              <small class="text-muted">Created: {{ request.created_at|date:"M d, Y" }}</small>
-            </div>
-            <div class="text-end">
+          <div class="border-bottom pb-3 mb-3">
+            <h6 class="fw-bold">AI Design Request #{{ request.ai_request_id }}</h6>
+            <p class="text-muted small mb-1">Style: {{ request.style }}</p>
+            <small class="text-muted">Created: {{ request.created_at|date:"M d, Y" }}</small>
+            <div class="mt-2 d-flex justify-content-between align-items-center">
               <span class="badge bg-secondary">In Progress</span>
-              <div class="mt-2">
-                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-              </div>
+              <a href="#" class="btn btn-sm btn-outline-primary">View</a>
             </div>
           </div>
           {% empty %}
           <div class="text-center text-muted py-4">
-            <i class="bi bi-robot display-1"></i>
+            <i class="bi bi-robot display-5"></i>
             <p class="mt-2">No AI requests yet</p>
             <a href="#" class="btn btn-primary">Create Your First AI Design</a>
           </div>
@@ -179,80 +151,27 @@
         </div>
       </div>
 
-      <!-- Upcoming Sessions -->
-      <div class="card shadow-sm">
+      <!-- Sessions -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header">
           <h5 class="mb-0">Upcoming Sessions</h5>
         </div>
         <div class="card-body">
           {% for session in upcoming_sessions %}
-          <div class="border-bottom pb-2 mb-2">
-            <h6 class="mb-1">Session with Engineer</h6>
-            <p class="mb-1 small">{{ session.scheduled_at|date:"M d, Y - H:i" }}</p>
+          <div class="border-bottom pb-3 mb-3">
+            <h6>Session with Engineer</h6>
+            <p class="small text-muted mb-1">{{ session.scheduled_at|date:"M d, Y - H:i" }}</p>
             {% if session.meeting_link %}
-            <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-success w-100 mb-1">Join Meeting</a>
+              <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-success w-100 mb-2">Join Meeting</a>
             {% else %}
-            <span class="text-muted small">Link will be provided soon</span>
+              <span class="text-muted small d-block mb-2">Link will be provided soon</span>
             {% endif %}
-            <button type="button" class="btn btn-sm btn-outline-warning w-100 mt-1" data-bs-toggle="modal" data-bs-target="#rescheduleSessionModal{{ session.id }}">Reschedule</button>
-            <!-- Reschedule Modal -->
-            <div class="modal fade" id="rescheduleSessionModal{{ session.id }}" tabindex="-1" aria-labelledby="rescheduleSessionLabel{{ session.id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="rescheduleSessionLabel{{ session.id }}">Reschedule Session</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form method="post" action="{% url 'reschedule_session' session.id %}">
-                      {% csrf_token %}
-                      <div class="mb-3">
-                        <label for="newDate{{ session.id }}" class="form-label">New Date & Time</label>
-                        <input type="datetime-local" class="form-control" id="newDate{{ session.id }}" name="new_scheduled_at" required>
-                      </div>
-                      <button type="submit" class="btn btn-warning w-100">Request Reschedule</button>
-                    </form>
-                    <small class="text-muted d-block mt-2">Your engineer must approve the new appointment before it is confirmed.</small>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#rescheduleSessionModal{{ session.id }}">Reschedule</button>
           </div>
           {% empty %}
           <p class="text-muted text-center">No upcoming sessions</p>
           {% endfor %}
-          <button type="button" class="btn btn-outline-primary btn-sm w-100 mt-2" data-bs-toggle="modal" data-bs-target="#bookSessionModal">Book New Session</button>
-      <!-- Book Session Modal -->
-      <div class="modal fade" id="bookSessionModal" tabindex="-1" aria-labelledby="bookSessionLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="bookSessionLabel">Book New Session</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form method="post" action="{% url 'reserve_session' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                  <label for="engineerSelect" class="form-label">Choose Engineer</label>
-                  <select class="form-select" id="engineerSelect" name="engineer">
-                    {% for engineer in current_engineers %}
-                      <option value="{{ engineer.eng_id }}">{{ engineer.user.first_name }} {{ engineer.user.last_name }} ({{ engineer.education }})</option>
-                    {% empty %}
-                      <option disabled>No engineers available</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="sessionDate" class="form-label">Date & Time</label>
-                  <input type="datetime-local" class="form-control" id="sessionDate" name="scheduled_at" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Book Session</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+          <button class="btn btn-outline-primary btn-sm w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookSessionModal">Book New Session</button>
         </div>
       </div>
 

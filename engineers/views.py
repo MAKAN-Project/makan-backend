@@ -305,3 +305,50 @@ def manage_availability(request):
     return render(request, "engineers/manage_availability.html", {
         "availabilities": availabilities
     })
+
+def upload_project_file(request, request_id):
+    project = get_object_or_404(ProjectRequest, request_id=request_id)
+
+    # تأكد إن المستخدم هو المهندس نفسه
+    if project.engineer.user != request.user:
+        messages.error(request, "❌ You are not authorized to upload files for this project.")
+        return redirect('engineers_dashboard')
+
+    if request.method == "POST" and request.FILES.get("file"):
+        uploaded_file = request.FILES["file"]
+        file_name = request.POST.get("file_name", uploaded_file.name)
+        ext = uploaded_file.name.split('.')[-1].lower()
+
+        # إنشاء كائن الملف
+        File.objects.create(
+            user=project.client,
+            project_request=project,
+            file_name=file_name,
+            type=ext,
+            file=uploaded_file,
+            path=f"uploads/{uploaded_file.name}",
+            status='pending'
+        )
+
+        # تحديث حالة المشروع
+        project.status = "in_progress"
+        project.updated_at = timezone.now()
+        project.save()
+
+        # 🔔 إنشاء إشعار للعميل
+        Notification.objects.create(
+            sender=request.user,  # المهندس
+            recipient=project.client,  # العميل
+            project_request=project,
+            type='file_uploaded',
+            message=f"📐  A new file has been uploaded by engineer {project.engineer.user.first_name} لمشروعك: <strong>{file_name}</strong>",
+            created_at=timezone.now()
+        )
+
+        messages.success(request, f"✅ File '{file_name}' uploaded successfully and notification sent to client.")
+        return redirect('engineers_dashboard')
+
+    messages.error(request, "⚠️ No file selected.")
+    return redirect('engineers_dashboard')
+
+

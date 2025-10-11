@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My AI Requests - MAKAN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="fw-bold text-primary mb-4">My AI Requests</h2>
+
+  <!-- Upload Form -->
+  <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm mb-5">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Upload Room Image</label>
+      <input type="file" name="image" accept="image/*" required class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Choose Style</label>
+      <select name="style" class="form-select" required>
+        <option value="modern">Modern</option>
+        <option value="classic">Classic</option>
+        <option value="minimal">Minimal</option>
+        <option value="industrial">Industrial</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2">Generate Design</button>
+  </form>
+
+  <!-- Previous Requests -->
+  <div class="row g-4">
+    {% for req in requests %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-header d-flex justify-content-between">
+            <span class="fw-bold text-capitalize">{{ req.style }}</span>
+            <span class="badge bg-{% if req.status == 'completed' %}success{% else %}secondary{% endif %}">
+  {{ req.status }}
+</span>
+          </div>
+          <div class="card-body text-center">
+            {% if req.output_images_paths %}
+              <img src="/media/{{ req.output_images_paths }}" class="img-fluid rounded mb-3" alt="AI Output">
+            {% else %}
+              <div class="text-muted">Processing...</div>
+            {% endif %}
+          </div>
+          <div class="card-footer text-muted small">
+            {{ req.created_at|date:"M d, Y - H:i" }}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center text-muted">No AI requests yet.</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
