@@ -1,181 +1,272 @@
 {% extends "base.html" %}
-
 {% block title %}Customer Dashboard - MAKAN{% endblock %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'style/style.css' %}">
+<!-- Chart.js for mini charts (optional, used below) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block content %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'style/style.css' %}">
-
-
-
 <div class="container-fluid">
   <div class="row">
-    <!-- Sidebar -->
+    <!-- Sidebar (keep as you had) -->
     <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
       <div class="position-sticky">
         <h5 class="sidebar-heading px-2 mt-2 mb-3">Customer Dashboard</h5>
         <ul class="nav flex-column">
-         <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
-  <li class="nav-item"><a class="nav-link" href="#">My AI Requests</a></li>
-  <li class="nav-item"><a class="nav-link" href="#">My Sessions</a></li>
-  <li class="nav-item"><a class="nav-link" href="#">My Files</a></li>
-  <li class="nav-item"><a class="nav-link" href="#">3D Models</a></li>
-  <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_ai_requests' %}">My AI Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_sessions' %}">My Sessions</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_files' %}">My Files</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_3d_models' %}">3D Models</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'customer_profile' %}">Profile</a></li>
         </ul>
       </div>
     </nav>
 
-    <!-- Main content -->
+    <!-- Main -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 
-      <!-- Header -->
-      <div class="d-flex justify-content-between flex-wrap align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-primary">Welcome, {{ request.session.first_name }}!</h1>
-        <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> New AI Request</a>
+      <!-- Hero: Welcome + quick status -->
+      <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+        <div>
+          <h1 class="h3 fw-bold text-primary mb-1">Welcome back, {{ request.session.first_name }} 👋</h1>
+          <p class="text-muted mb-0">Good to see you — here's a quick summary of your projects and sessions today.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'customer_ai_requests' %}" class="btn btn-outline-primary">
+            <i class="bi bi-stars me-1"></i> AI Studio
+          </a>
+          
+        </div>
       </div>
 
-      <!-- Notifications -->
-      {% if notifications %}
-        <div class="alert alert-info shadow-sm">
-          <h5>Notifications</h5>
-          <ul class="mb-0">
-            {% for note in notifications %}
-              <li>
-                {{ note.message }}
-                <small class="text-muted">({{ note.created_at|timesince }} ago)</small>
-              </li>
-            {% endfor %}
-          </ul>
+      <!-- Statistics + mini charts -->
+      <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-sm-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-calendar-event text-primary fs-2 mb-2"></i>
+              <h5 class="mb-0">{{ today_sessions_count }}</h5>
+              <small class="text-muted">Today's Sessions</small>
+              <canvas id="chartSessions" height="40" class="mt-2"></canvas>
+            </div>
+          </div>
         </div>
-      {% endif %}
-
-      <!-- Building Stage -->
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header">
-          <h5 class="mb-0"><i class="bi bi-house-door me-2"></i> Choose Your Building Stage</h5>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-clipboard-data text-success fs-2 mb-2"></i>
+              <h5 class="mb-0">{{ project_requests_count }}</h5>
+              <small class="text-muted">Project Requests</small>
+              <canvas id="chartRequests" height="40" class="mt-2"></canvas>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6 col-lg-3">
-              <a href="{% url 'engineering_fields' stage='empty_land' %}" class="card text-center text-decoration-none text-dark h-100">
-                <div class="card-body">
-                  <i class="bi bi-tree display-5 text-success mb-2"></i>
-                  <h6>Build from Scratch</h6>
-                  <p class="small text-muted">Start with an empty land and build your dream home.</p>
-                </div>
-              </a>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-check-circle text-warning fs-2 mb-2"></i>
+              <h5 class="mb-0">{{ completed_projects_count }}</h5>
+              <small class="text-muted">Completed Projects</small>
+              <canvas id="chartCompleted" height="40" class="mt-2"></canvas>
             </div>
-            <div class="col-md-6 col-lg-3">
-              <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="card text-center text-decoration-none text-dark h-100">
-                <div class="card-body">
-                  <i class="bi bi-building display-5 text-info mb-2"></i>
-                  <h6>Empty Apartment/House</h6>
-                  <p class="small text-muted">You have an empty apartment or house ready for work.</p>
-                </div>
-              </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-              <a href="{% url 'engineering_fields' stage='decorate' %}" class="card text-center text-decoration-none text-dark h-100">
-                <div class="card-body">
-                  <i class="bi bi-palette display-5 text-danger mb-2"></i>
-                  <h6>Decorate / Redecorate</h6>
-                  <p class="small text-muted">Decorate or redecorate your existing space.</p>
-                </div>
-              </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-              <a href="{% url 'engineering_fields' stage='3d_furniture' %}" class="card text-center text-decoration-none text-dark h-100">
-                <div class="card-body">
-                  <i class="bi bi-cube display-5 text-primary mb-2"></i>
-                  <h6>3D Furniture</h6>
-                  <p class="small text-muted">Visualize furniture in 3D for realistic previews.</p>
-                </div>
-              </a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-folder text-danger fs-2 mb-2"></i>
+              <h5 class="mb-0">{{ total_files_count }}</h5>
+              <small class="text-muted">Uploaded Files</small>
+              <canvas id="chartFiles" height="40" class="mt-2"></canvas>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="row mb-4">
-        <div class="col-md-4">
-          <div class="card text-center shadow-sm border-0">
+      <!-- Recent Notifications (under stats) -->
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><i class="bi bi-bell me-2 text-primary"></i> Recent Notifications</h6>
+              <a href="{% url 'notifications_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
             <div class="card-body">
-              <h6 class="text-muted">Total Requests</h6>
-              <p class="display-6 fw-bold text-primary">{{ total_requests }}</p>
+              {% if notifications %}
+                <ul class="list-unstyled mb-0">
+                  {% for note in notifications|slice:":3" %}
+                    <li class="py-2 border-bottom d-flex justify-content-between align-items-start">
+                      <div>
+                        <p class="mb-1 fw-semibold">{{ note.message }}</p>
+                        <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+                      </div>
+                      {% if not note.is_read %}
+                        <span class="badge bg-warning text-dark align-self-start">New</span>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="text-muted mb-0">No recent notifications.</p>
+              {% endif %}
             </div>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="card text-center shadow-sm border-0">
-            <div class="card-body">
-              <h6 class="text-muted">Total Sessions</h6>
-              <p class="display-6 fw-bold text-primary">{{ total_sessions }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center shadow-sm border-0">
-            <div class="card-body">
-              <h6 class="text-muted">3D Models</h6>
-              <p class="display-6 fw-bold text-primary">{{ total_3d_models }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- AI Requests -->
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Recent AI Requests</h5>
-          <a href="#" class="btn btn-sm btn-primary">New Request</a>
-        </div>
-        <div class="card-body">
-          {% for request in recent_ai_requests %}
-          <div class="border-bottom pb-3 mb-3">
-            <h6 class="fw-bold">AI Design Request #{{ request.ai_request_id }}</h6>
-            <p class="text-muted small mb-1">Style: {{ request.style }}</p>
-            <small class="text-muted">Created: {{ request.created_at|date:"M d, Y" }}</small>
-            <div class="mt-2 d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">In Progress</span>
-              <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+        <!-- Choose Your Building Stage (SECOND) -->
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bi bi-layers me-2 text-primary"></i> Choose Your Building Stage</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-6 col-md-6 col-lg-6">
+                  <a href="{% url 'engineering_fields' stage='empty_land' %}" class="d-block text-decoration-none text-dark card h-100 hover-shadow">
+                    <div class="card-body text-center">
+                      <i class="bi bi-bricks display-5 mb-2 text-primary"></i>
+                      <h6 class="mb-0">Build from Scratch</h6>
+                      <small class="text-muted d-block mt-1">Empty land → complete project</small>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-6 col-md-6 col-lg-6">
+                  <a href="{% url 'engineering_fields' stage='empty_apartment' %}" class="d-block text-decoration-none text-dark card h-100 hover-shadow">
+                    <div class="card-body text-center">
+                      <i class="bi bi-buildings display-5 mb-2 text-success"></i>
+                      <h6 class="mb-0">Empty Apartment</h6>
+                      <small class="text-muted d-block mt-1">Ready space to transform</small>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-6 col-md-6 col-lg-6">
+                  <a href="{% url 'engineering_fields' stage='decorate' %}" class="d-block text-decoration-none text-dark card h-100 hover-shadow">
+                    <div class="card-body text-center">
+                      <i class="bi bi-brush display-5 mb-2 text-warning"></i>
+                      <h6 class="mb-0">Decorate</h6>
+                      <small class="text-muted d-block mt-1">Refurbish & redesign</small>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-6 col-md-6 col-lg-6">
+                  <a href="{% url 'engineering_fields' stage='3d_furniture' %}" class="d-block text-decoration-none text-dark card h-100 hover-shadow">
+                    <div class="card-body text-center">
+                      <i class="bi bi-box-seam display-5 mb-2 text-danger"></i>
+                      <h6 class="mb-0">3D Furniture</h6>
+                      <small class="text-muted d-block mt-1">Visualize furniture</small>
+                    </div>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-          {% empty %}
-          <div class="text-center text-muted py-4">
-            <i class="bi bi-robot display-5"></i>
-            <p class="mt-2">No AI requests yet</p>
-            <a href="#" class="btn btn-primary">Create Your First AI Design</a>
-          </div>
-          {% endfor %}
         </div>
-      </div>
+      </div> <!-- end row -->
 
-      <!-- Sessions -->
+      <!-- Today's Sessions -->
       <div class="card shadow-sm mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Upcoming Sessions</h5>
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><i class="bi bi-calendar-event me-2"></i> Today's Sessions</h6>
+          <a href="{% url 'customer_sessions' %}" class="btn btn-sm btn-outline-primary">View All</a>
         </div>
         <div class="card-body">
-          {% for session in upcoming_sessions %}
-          <div class="border-bottom pb-3 mb-3">
-            <h6>Session with Engineer</h6>
-            <p class="small text-muted mb-1">{{ session.scheduled_at|date:"M d, Y - H:i" }}</p>
-            {% if session.meeting_link %}
-              <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-success w-100 mb-2">Join Meeting</a>
-            {% else %}
-              <span class="text-muted small d-block mb-2">Link will be provided soon</span>
-            {% endif %}
-            <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#rescheduleSessionModal{{ session.id }}">Reschedule</button>
-          </div>
-          {% empty %}
-          <p class="text-muted text-center">No upcoming sessions</p>
-          {% endfor %}
-          <button class="btn btn-outline-primary btn-sm w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookSessionModal">Book New Session</button>
+          {% if today_sessions %}
+            {% for s in today_sessions %}
+              <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                <div>
+                  <div class="fw-semibold">Session with {{ s.eng.user.first_name }} {{ s.eng.user.last_name }}</div>
+                  <small class="text-muted">{{ s.scheduled_at|date:"M d, Y - H:i" }} • {{ s.status|title }}</small>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                  {% if s.meeting_link %}
+                    <a href="{{ s.meeting_link }}" target="_blank" class="btn btn-success btn-sm mb-1"><i class="bi bi-camera-video me-1"></i> Join</a>
+                  {% else %}
+                    <button class="btn btn-outline-secondary btn-sm mb-1" disabled>No link yet</button>
+                  {% endif %}
+                  <a href="{% url 'engineer_details' s.eng.eng_id %}" class="btn btn-outline-primary btn-sm">Engineer</a>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted text-center py-4 mb-0">No sessions for today.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- My Project Requests -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><i class="bi bi-clipboard-data me-2"></i> My Project Requests</h6>
+          <a href="{% url 'customer_projects' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body">
+          {% if project_requests %}
+            {% for p in project_requests %}
+              <div class="border-bottom py-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="fw-semibold">Request #{{ p.request_id }} — {{ p.engineer.user.first_name }} {{ p.engineer.user.last_name }}</div>
+                    <small class="text-muted">{{ p.description|truncatechars:90 }}</small>
+                  </div>
+                  <div class="text-end">
+                    <span class="badge 
+                      {% if p.status == 'pending' %}bg-warning text-dark
+                      {% elif p.status == 'in_progress' %}bg-info
+                      {% elif p.status == 'completed' %}bg-success
+                      {% endif %}">
+                      {{ p.status|title }}
+                    </span>
+                    <div class="mt-2">
+                      <a href="{% url 'customer_project_details' p.request_id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted text-center py-4 mb-0">No project requests yet.</p>
+          {% endif %}
         </div>
       </div>
 
     </main>
   </div>
 </div>
+
+<style>
+  .hover-shadow:hover { transform: translateY(-4px); transition: .25s; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+  .card canvas {
+  width: 100% !important;
+  height: 80px !important;
+}
+</style>
+
+<!-- mini charts script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // helper to init a tiny line chart
+  function tinyLine(ctxId, data) {
+    const ctx = document.getElementById(ctxId);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: data.labels, datasets: [{ data: data.series, tension: .4, fill: true, borderWidth:1, pointRadius:0 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}}}
+    });
+  }
+
+  // pass from template context (fallback arrays if not provided)
+  try {
+    tinyLine('chartSessions', { labels:[...Array(7).keys()], series: {{ sessions_chart|default:"[1,2,1,3,2,1,0]" }} });
+    tinyLine('chartRequests', { labels:[...Array(7).keys()], series: {{ requests_chart|default:"[0,1,1,2,1,0,1]" }} });
+    tinyLine('chartCompleted', { labels:[...Array(7).keys()], series: {{ completed_chart|default:"[0,0,1,0,1,0,0]" }} });
+    tinyLine('chartFiles', { labels:[...Array(7).keys()], series: {{ files_chart|default:"[1,1,0,1,2,1,1]" }} });
+  } catch(e) { console.warn(e); }
+});
+</script>
+
 {% endblock %}

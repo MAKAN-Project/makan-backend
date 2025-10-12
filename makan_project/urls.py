@@ -36,7 +36,7 @@ urlpatterns = [
     path('models3d/', include('models3d.urls')),    # روابط models3d
     path('payments/', include('payments.urls')),    # روابط payments
     path('notifications/', include('notifications.urls')),
-
+    
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

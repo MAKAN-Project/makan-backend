@@ -298,6 +298,7 @@ footer.site-footer {
   color: #fff;
   transform: translateY(-50%) translateX(5px);
 }
+
 .footer {
   background: linear-gradient(180deg, var(--makan-primary) 0%, #08192E 100%);
 }
