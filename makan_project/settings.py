@@ -231,3 +231,12 @@ ALLOWED_FILE_EXTENSIONS = [
 
 
 
+import mimetypes
+
+# إصلاح مشكلة تحميل ملفات 3D بدلاً من عرضها
+mimetypes.add_type("model/gltf+json", ".gltf", True)
+mimetypes.add_type("model/gltf-binary", ".glb", True)
+mimetypes.add_type("model/stl", ".stl", True)
+mimetypes.add_type("model/obj", ".obj", True)
+mimetypes.add_type("image/vnd.dwg", ".dwg", True)
+mimetypes.add_type("image/vnd.dxf", ".dxf", True)

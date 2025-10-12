@@ -15,8 +15,8 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import make_aware
-
-
+from django.http import FileResponse, Http404
+from django.http import HttpResponse, Http404
 
 def home(request):
     selected_filter = request.GET.get('filter', 'All').lower()
@@ -88,4 +88,25 @@ def home(request):
     })
 
 
+def serve_3d_file(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'uploads', filename)
+    if not os.path.exists(file_path):
+        raise Http404("File not found")
 
+    ext = os.path.splitext(filename)[1].lower()
+    content_types = {
+        '.gltf': 'model/gltf+json',
+        '.glb': 'model/gltf-binary',
+        '.obj': 'text/plain',
+        '.stl': 'model/stl',
+    }
+    content_type = content_types.get(ext, 'application/octet-stream')
+
+    with open(file_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type=content_type)
+
+    # 👇 أهم سطرين
+    response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+    response['X-Content-Type-Options'] = 'nosniff'  # يمنع التحميل الإجباري
+
+    return response

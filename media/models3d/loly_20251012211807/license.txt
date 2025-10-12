@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Old Sofa with Bake Normal
+* source:	https://sketchfab.com/3d-models/low-poly-old-sofa-with-bake-normal-0dbc5483a7884e17bfc086886c676006
+* author:	Andante (https://sketchfab.com/AndanteOle)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Old Sofa with Bake Normal" (https://sketchfab.com/3d-models/low-poly-old-sofa-with-bake-normal-0dbc5483a7884e17bfc086886c676006) by Andante (https://sketchfab.com/AndanteOle) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

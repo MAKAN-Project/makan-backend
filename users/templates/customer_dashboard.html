@@ -9,22 +9,60 @@
 {% endblock %}
 
 {% block content %}
+
+
+
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar (keep as you had) -->
-    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
-      <div class="position-sticky">
-        <h5 class="sidebar-heading px-2 mt-2 mb-3">Customer Dashboard</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_ai_requests' %}">My AI Requests</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_sessions' %}">My Sessions</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_files' %}">My Files</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_3d_models' %}">3D Models</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_profile' %}">Profile</a></li>
-        </ul>
-      </div>
-    </nav>
+    <!-- Sidebar -->
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+  <div class="position-sticky pt-3">
+    <h5 class="sidebar-heading px-3 mt-2 mb-3 text-primary">Customer Dashboard</h5>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_ai_requests' %}">
+          <i class="bi bi-stars me-2"></i> My AI Requests
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_sessions' %}">
+          <i class="bi bi-calendar-event me-2"></i> My Sessions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_files' %}">
+          <i class="bi bi-folder me-2"></i> My Files
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_3d_models' %}">
+          <i class="bi bi-box-seam me-2"></i> 3D Models
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_profile' %}">
+          <i class="bi bi-person me-2"></i> Profile
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Toggle button for mobile -->
+<nav class="navbar navbar-light bg-light d-md-none shadow-sm mb-3">
+  <div class="container-fluid">
+    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+      <i class="bi bi-list"></i> Menu
+    </button>
+  </div>
+</nav>
+
 
     <!-- Main -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
@@ -93,7 +131,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h6 class="mb-0"><i class="bi bi-bell me-2 text-primary"></i> Recent Notifications</h6>
-              <a href="{% url 'notifications_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+              <a href="{% url 'notifications_page' %}" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body">
               {% if notifications %}
@@ -101,7 +139,7 @@
                   {% for note in notifications|slice:":3" %}
                     <li class="py-2 border-bottom d-flex justify-content-between align-items-start">
                       <div>
-                        <p class="mb-1 fw-semibold">{{ note.message }}</p>
+                        <p class="mb-1 fw-semibold">{{ note.message|safe }}</p>
                         <small class="text-muted">{{ note.created_at|timesince }} ago</small>
                       </div>
                       {% if not note.is_read %}

@@ -306,49 +306,81 @@ def manage_availability(request):
         "availabilities": availabilities
     })
 
+
 def upload_project_file(request, request_id):
+    # ✅ تحقق من وجود جلسة مستخدم
+    user_id = request.session.get("user_id")
+    if not user_id:
+        messages.error(request, "You must be logged in.")
+        return redirect("login_register")
+
+    # ✅ جلب المستخدم
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect("login_register")
+
+    # ✅ جلب المهندس المرتبط بهذا المستخدم
+    try:
+        engineer = Engineer.objects.get(user=user)
+    except Engineer.DoesNotExist:
+        messages.error(request, "Engineer profile not found.")
+        return redirect("engineer_complete_profile")
+
+    # ✅ جلب المشروع المطلوب
     project = get_object_or_404(ProjectRequest, request_id=request_id)
 
-    # تأكد إن المستخدم هو المهندس نفسه
-    if project.engineer.user != request.user:
-        messages.error(request, "❌ You are not authorized to upload files for this project.")
-        return redirect('engineers_dashboard')
+    # ✅ تحقق إن هذا المهندس هو صاحب المشروع فعلاً
+    if project.engineer != engineer:
+        messages.error(request, "You are not authorized to upload files for this project.")
+        return redirect("engineers_dashboard")
 
+    # ✅ معالجة رفع الملف
     if request.method == "POST" and request.FILES.get("file"):
         uploaded_file = request.FILES["file"]
         file_name = request.POST.get("file_name", uploaded_file.name)
-        ext = uploaded_file.name.split('.')[-1].lower()
+        ext = uploaded_file.name.split(".")[-1].lower()
 
-        # إنشاء كائن الملف
-        File.objects.create(
-            user=project.client,
+        # 🔹 إنشاء سجل الملف في قاعدة البيانات
+        file_obj = File.objects.create(
+            user=project.client,  # المستلم هو العميل
             project_request=project,
             file_name=file_name,
             type=ext,
             file=uploaded_file,
             path=f"uploads/{uploaded_file.name}",
-            status='pending'
+            status="pending",
         )
 
-        # تحديث حالة المشروع
+        # 🔹 تحديث حالة المشروع
         project.status = "in_progress"
         project.updated_at = timezone.now()
         project.save()
 
-        # 🔔 إنشاء إشعار للعميل
-        Notification.objects.create(
-            sender=request.user,  # المهندس
-            recipient=project.client,  # العميل
-            project_request=project,
-            type='file_uploaded',
-            message=f"📐  A new file has been uploaded by engineer {project.engineer.user.first_name} لمشروعك: <strong>{file_name}</strong>",
-            created_at=timezone.now()
+        # 🔹 تحديد ما إذا كان الملف ثلاثي الأبعاد
+        is_3d = ext in ["obj", "fbx", "glb", "gltf", "stl"]
+
+        # 🔹 إنشاء إشعار للعميل
+        message_text = (
+            f"📁 Engineer <strong>{engineer.user.first_name}</strong> "
+            f"has uploaded {'a 3D file' if is_3d else 'a new file'} "
+            f"for your project: <strong>{file_name}</strong>."
         )
 
-        messages.success(request, f"✅ File '{file_name}' uploaded successfully and notification sent to client.")
-        return redirect('engineers_dashboard')
+        Notification.objects.create(
+            sender=user,
+            recipient=project.client,
+            project_request=project,
+            type="file_uploaded",
+            message=message_text,
+            created_at=timezone.now(),
+        )
 
-    messages.error(request, "⚠️ No file selected.")
-    return redirect('engineers_dashboard')
+        # 🔹 رسالة نجاح
+        messages.success(request, f"✅ File '{file_name}' uploaded successfully and client notified.")
+        return redirect("engineers_dashboard")
 
-
+    # ⚠️ لو ما في ملف
+    messages.error(request, "No file selected.")
+    return redirect("engineers_dashboard")
