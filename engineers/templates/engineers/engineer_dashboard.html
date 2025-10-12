@@ -3,6 +3,64 @@
 
 {% block title %}Engineer Dashboard{% endblock %}
 
+{% block extra_head %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('dashboard-layout');
+  
+  // Sidebar scroll behavior - stop at footer
+  const sidebar = document.querySelector('.sidebar');
+  const footer = document.querySelector('.footer');
+  
+  if (sidebar && footer) {
+    let ticking = false;
+    
+    function handleSidebarScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const sidebarHeight = sidebar.offsetHeight;
+      const navbarHeight = 80;
+      
+      // Get footer position
+      const footerTop = footer.offsetTop;
+      const footerRect = footer.getBoundingClientRect();
+      const footerTopFromViewport = footerRect.top + scrollTop;
+      
+      // Calculate if sidebar would overlap footer
+      const sidebarBottomPosition = scrollTop + navbarHeight + sidebarHeight;
+      
+      if (sidebarBottomPosition >= footerTopFromViewport) {
+        // Sidebar would overlap footer, position it above footer
+        const newTop = footerTopFromViewport - sidebarHeight;
+        sidebar.style.top = Math.max(newTop, navbarHeight) + 'px';
+        sidebar.classList.add('sticky-bottom');
+      } else {
+        // Normal fixed position
+        sidebar.style.top = navbarHeight + 'px';
+        sidebar.classList.remove('sticky-bottom');
+      }
+      
+      ticking = false;
+    }
+    
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(handleSidebarScroll);
+        ticking = true;
+      }
+    }
+    
+    // Attach scroll event listener with throttling
+    window.addEventListener('scroll', requestTick);
+    window.addEventListener('resize', handleSidebarScroll);
+    
+    // Initial call
+    handleSidebarScroll();
+  }
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <style>
   .notification-message a {
@@ -17,13 +75,13 @@
 }
 
 </style>
-<div class="container-fluid mt-5 pt-4">
+<div class="container-fluid">
   <div class="row">
 
     <!-- Sidebar -->
-    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar vh-100 border-end position-fixed">
-      <div class="pt-3 px-2">
-        <h5 class="text-muted mb-4">Engineer Dashboard</h5>
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <div class="position-sticky">
+        <h5 class="sidebar-heading px-2 mt-2 mb-3">Engineer Dashboard</h5>
         <ul class="nav flex-column">
           <li class="nav-item mb-1">
             <a class="nav-link active rounded" href="{% url 'engineers_dashboard' %}">
@@ -32,7 +90,7 @@
           </li>
           <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-card-checklist me-1"></i> Requests</a></li>
           <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-calendar-event me-1"></i> Sessions</a></li>
-          <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-folder2-open me-1"></i> Portfolio</a></li>
+          <li class="nav-item mb-1"><a class="nav-link" href="{% url 'projects' %}"><i class="bi bi-folder2-open me-1"></i> Portfolio</a></li>
           <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-lightbulb me-1"></i> AI Preview</a></li>
           <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-box-seam me-1"></i> 3D Models</a></li>
           <li class="nav-item mb-1"><a class="nav-link" href="#"><i class="bi bi-person-circle me-1"></i> Profile</a></li>
@@ -41,7 +99,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 offset-md-3">
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 
       <!-- Dashboard Cards -->
       <div class="row my-4">

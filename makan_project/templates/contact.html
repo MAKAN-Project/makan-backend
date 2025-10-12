@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact Us - MAKAN{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --makan-primary: #1c2431;  /* Navy Blue */
+    --makan-accent:  #D6AE32;  /* Mustard Yellow */
+    --makan-info:    #5DAFEF;  /* Sky Blue */
+    --makan-bg:      #F4F4F4;  /* Light background */
+    --makan-text:    #0A1B2E;  /* Deep navy text */
+  }
+
+  .hero-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+    padding: 5rem 0;
+    margin-top: 76px; /* Account for fixed navbar */
+  }
+  
+  .contact-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
+    text-align: center;
+    border-left: 4px solid var(--makan-accent);
+  }
+  
+  .contact-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .contact-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--makan-primary), var(--makan-info));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 3rem;
+    color: white;
+  }
+  
+  .contact-info {
+    background: var(--makan-bg);
+    border-radius: 15px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+  }
+  
+  .contact-form {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  
+  .form-control:focus {
+    border-color: var(--makan-accent);
+    box-shadow: 0 0 0 0.2rem rgba(214, 174, 50, 0.25);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--makan-primary), #132E4E);
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #132E4E, var(--makan-primary));
+    transform: translateY(-2px);
+  }
+  
+  .contact-method {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    margin-bottom: 2rem;
+  }
+  
+  .contact-method:hover {
+    transform: translateY(-5px);
+  }
+  
+  .contact-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--makan-accent), #B8941A);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+  }
+  
+  .email-link {
+    color: var(--makan-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .email-link:hover {
+    color: var(--makan-accent);
+    text-decoration: underline;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-3 fw-bold mb-4">Contact Us</h1>
+        <p class="lead mb-4">Get in touch with our expert team. We're here to help bring your architectural vision to life</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="#team" class="btn btn-warning btn-lg rounded-pill px-5">
+            <i class="bi bi-people me-2"></i>Meet Our Team
+          </a>
+          <a href="#contact-form" class="btn btn-outline-light btn-lg rounded-pill px-5">
+            <i class="bi bi-envelope me-2"></i>Send Message
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Information -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 mb-5">
+      <div class="col-lg-4">
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="bi bi-envelope"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Email Us</h5>
+          <p class="text-muted mb-3">Send us a message and we'll respond within 24 hours</p>
+          <a href="mailto:info@makan.com" class="email-link">info@makan.com</a>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="bi bi-telephone"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Call Us</h5>
+          <p class="text-muted mb-3">Speak directly with our team during business hours</p>
+          <a href="tel:+1234567890" class="email-link">+1 (234) 567-890</a>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Visit Us</h5>
+          <p class="text-muted mb-3">Come see us at our headquarters</p>
+          <p class="email-link">123 Innovation St.<br>Tech City, TC 12345</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Members -->
+<section id="team" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Our Leadership Team</h2>
+      <p class="text-muted">Connect directly with our experienced leaders</p>
+    </div>
+    
+    <div class="row g-4">
+      {% for member in team_members %}
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card">
+          <div class="contact-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <h5 class="fw-bold mb-2">{{ member.name }}</h5>
+          <p class="text-primary mb-3">{{ member.role }}</p>
+          <p class="text-muted small mb-3">{{ member.description }}</p>
+          <a href="mailto:{{ member.email }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-envelope me-1"></i>Contact {{ member.name.split.0 }}
+          </a>
+          <div class="mt-2">
+            <small class="text-muted">{{ member.email }}</small>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Contact Form -->
+<section id="contact-form" class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="contact-form">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold mb-3">Send Us a Message</h2>
+            <p class="text-muted">Have a project in mind? We'd love to hear about it!</p>
+          </div>
+          
+          <form method="post" action="{% url 'contact' %}">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+              </div>
+              <div class="col-md-6">
+                <label for="email" class="form-label">Email Address *</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div class="col-md-6">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" name="phone">
+              </div>
+              <div class="col-md-6">
+                <label for="subject" class="form-label">Subject *</label>
+                <select class="form-control" id="subject" name="subject" required>
+                  <option value="">Select a subject</option>
+                  <option value="project_inquiry">New Project Inquiry</option>
+                  <option value="consultation">Consultation Request</option>
+                  <option value="partnership">Partnership Opportunity</option>
+                  <option value="support">Technical Support</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="message" class="form-label">Message *</label>
+                <textarea class="form-control" id="message" name="message" rows="6" required placeholder="Tell us about your project or inquiry..."></textarea>
+              </div>
+              <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-send me-2"></i>Send Message
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Additional Contact Info -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center">
+      <h3 class="fw-bold mb-4">Why Choose MAKAN?</h3>
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--makan-primary), #132E4E); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+              <i class="bi bi-clock"></i>
+            </div>
+          </div>
+          <h5 class="fw-bold">24/7 Support</h5>
+          <p class="text-muted">Round-the-clock assistance for all your project needs</p>
+        </div>
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--makan-accent), #B8941A); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+              <i class="bi bi-award"></i>
+            </div>
+          </div>
+          <h5 class="fw-bold">Expert Team</h5>
+          <p class="text-muted">Industry-leading professionals with proven track records</p>
+        </div>
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--makan-info), #4A96D1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+              <i class="bi bi-lightning"></i>
+            </div>
+          </div>
+          <h5 class="fw-bold">Fast Response</h5>
+          <p class="text-muted">Quick turnaround times without compromising quality</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

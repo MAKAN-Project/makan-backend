@@ -106,6 +106,132 @@
   }
 }
 
+/* ===== DASHBOARD LAYOUT FIXES ===== */
+/* Footer should always span full width - no sidebar constraints */
+
+/* Dashboard specific body class - Footer should span full width */
+.dashboard-layout .footer {
+  margin-left: 0 !important;
+  width: 100% !important;
+  position: relative;
+  z-index: 1010;
+}
+
+@media (max-width: 991.98px) {
+  .dashboard-layout .footer {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Ensure main content area has enough bottom padding */
+.dashboard-layout main {
+  padding-bottom: 2rem;
+  min-height: calc(100vh - 80px); /* Account for navbar height */
+}
+
+/* Specific sidebar adjustments for dashboard */
+.dashboard-layout .sidebar {
+  position: fixed;
+  top: 80px; /* Below navbar */
+  left: 0;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 1020;
+  transition: top 0.2s ease;
+  max-height: calc(100vh - 80px);
+  width: 250px;
+  background: linear-gradient(180deg, var(--makan-primary) 0%, #08192E 100%);
+  color: #fff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.12);
+}
+
+/* Sidebar heading and text styling */
+.dashboard-layout .sidebar .sidebar-heading,
+.dashboard-layout .sidebar h5 {
+  color: var(--makan-accent) !important;
+  font-weight: 600;
+}
+
+/* Sidebar navigation links */
+.dashboard-layout .sidebar .nav-link {
+  color: rgba(255,255,255,0.88) !important;
+  padding: 0.9rem 1.2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 3px solid transparent;
+  transition: all 0.25s ease;
+  border-radius: 0.375rem;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-layout .sidebar .nav-link i {
+  color: var(--makan-info);
+  font-size: 1.1rem;
+}
+
+.dashboard-layout .sidebar .nav-link:hover,
+.dashboard-layout .sidebar .nav-link.active {
+  background-color: rgba(255,255,255,0.08) !important;
+  color: var(--makan-accent) !important;
+  border-left: 3px solid var(--makan-accent);
+}
+
+.dashboard-layout .sidebar .nav-link.active i,
+.dashboard-layout .sidebar .nav-link:hover i {
+  color: var(--makan-accent) !important;
+}
+
+/* Sidebar sticky behavior - stops at footer */
+.dashboard-layout .sidebar.sticky-bottom {
+  position: fixed;
+  bottom: auto;
+  /* top will be set dynamically by JavaScript */
+}
+
+/* Container for proper sidebar positioning */
+.dashboard-layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Ensure sidebar content is scrollable when needed */
+.dashboard-layout .sidebar .position-sticky {
+  position: static !important;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Navbar scroll behavior CSS */
+.navbar-above-footer {
+  position: fixed !important;
+  transition: top 0.2s ease;
+}
+
+/* Main content adjustment for dashboard */
+.dashboard-layout .col-md-9.ms-sm-auto.col-lg-10 {
+  margin-left: 250px !important;
+  width: calc(100% - 250px) !important;
+}
+
+@media (max-width: 991.98px) {
+  .dashboard-layout .col-md-9.ms-sm-auto.col-lg-10 {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .dashboard-layout .sidebar {
+    left: -250px;
+    transition: left 0.3s ease;
+  }
+  
+  .dashboard-layout .sidebar.show {
+    left: 0;
+  }
+}
+
 /* ===== TOGGLE BUTTON ===== */
 .sidebar-toggle {
   border: none;

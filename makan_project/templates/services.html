@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Our Services - MAKAN{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --makan-primary: #1c2431;  /* Navy Blue */
+    --makan-accent:  #D6AE32;  /* Mustard Yellow */
+    --makan-info:    #5DAFEF;  /* Sky Blue */
+    --makan-bg:      #F4F4F4;  /* Light background */
+    --makan-text:    #0A1B2E;  /* Deep navy text */
+  }
+
+  .hero-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+    padding: 5rem 0;
+    margin-top: 76px; /* Account for fixed navbar */
+  }
+  
+  .service-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 100%;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  }
+  
+  .service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  
+  .service-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+  }
+  
+  .service-icon.architecture { background: linear-gradient(135deg, var(--makan-primary), #132E4E); }
+  .service-icon.interior { background: linear-gradient(135deg, var(--makan-accent), #B8941A); }
+  .service-icon.civil { background: linear-gradient(135deg, var(--makan-info), #4A96D1); }
+  .service-icon.mechanical { background: linear-gradient(135deg, #132E4E, var(--makan-primary)); }
+  .service-icon.ai { background: linear-gradient(135deg, var(--makan-accent), #D6AE32); }
+  .service-icon.tech { background: linear-gradient(135deg, var(--makan-info), #5DAFEF); }
+  .service-icon.consultation { background: linear-gradient(135deg, #B8941A, var(--makan-accent)); }
+  .service-icon.management { background: linear-gradient(135deg, #4A96D1, var(--makan-info)); }
+  
+  .process-step {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+  }
+  
+  .process-step:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+  }
+  
+  .process-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--makan-primary), #132E4E);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+  }
+  
+  .cta-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+  }
+  
+  .feature-highlight {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  
+  .feature-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--makan-accent), #B8941A);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 2rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-3 fw-bold mb-4">Our Professional Services</h1>
+        <p class="lead mb-4">Comprehensive engineering solutions powered by innovation, expertise, and cutting-edge technology</p>
+        <a href="{% url 'login_register' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+          <i class="bi bi-rocket-takeoff me-2"></i>Start Your Project Today
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Engineering Services -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Core Engineering Services</h2>
+      <p class="text-muted">Professional engineering expertise across multiple disciplines</p>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Architecture Design -->
+      <div class="col-lg-3 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon architecture">
+            <i class="bi bi-building"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Architecture Design</h5>
+          <p class="text-muted mb-3">Complete building design, floor plans, 3D modeling, and architectural visualization for residential and commercial projects.</p>
+          <ul class="list-unstyled small text-muted">
+            <li>• Building Design & Planning</li>
+            <li>• Floor Plans & Layouts</li>
+            <li>• 3D Architectural Models</li>
+            <li>• Construction Documentation</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Interior Design -->
+      <div class="col-lg-3 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon interior">
+            <i class="bi bi-house-door"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Interior Design</h5>
+          <p class="text-muted mb-3">Creative space planning, furniture layout, aesthetic design, and complete interior transformation solutions.</p>
+          <ul class="list-unstyled small text-muted">
+            <li>• Space Planning & Layout</li>
+            <li>• Furniture & Decor Selection</li>
+            <li>• Color Schemes & Materials</li>
+            <li>• 3D Interior Visualization</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Civil Engineering -->
+      <div class="col-lg-3 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon civil">
+            <i class="bi bi-gear-wide-connected"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Civil Engineering</h5>
+          <p class="text-muted mb-3">Structural design, construction planning, infrastructure development, and comprehensive civil engineering solutions.</p>
+          <ul class="list-unstyled small text-muted">
+            <li>• Structural Design & Analysis</li>
+            <li>• Construction Planning</li>
+            <li>• Infrastructure Development</li>
+            <li>• Site Engineering</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Mechanical Engineering -->
+      <div class="col-lg-3 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon mechanical">
+            <i class="bi bi-gear-fill"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Mechanical Engineering</h5>
+          <p class="text-muted mb-3">HVAC systems, plumbing design, electrical systems, and mechanical infrastructure for optimal building performance.</p>
+          <ul class="list-unstyled small text-muted">
+            <li>• HVAC System Design</li>
+            <li>• Plumbing & Electrical</li>
+            <li>• Mechanical Infrastructure</li>
+            <li>• Energy Efficiency Solutions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology-Enhanced Services -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Technology-Enhanced Services</h2>
+      <p class="text-muted">Cutting-edge technology integration for superior results</p>
+    </div>
+    
+    <div class="row g-4">
+      <!-- AI-Powered Design -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon ai">
+            <i class="bi bi-cpu"></i>
+          </div>
+          <h5 class="fw-bold mb-3">AI-Powered Design</h5>
+          <p class="text-muted">Artificial intelligence assistance for design optimization, smart suggestions, and automated solutions.</p>
+        </div>
+      </div>
+      
+      <!-- 3D Visualization -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon tech">
+            <i class="bi bi-cube"></i>
+          </div>
+          <h5 class="fw-bold mb-3">3D Visualization</h5>
+          <p class="text-muted">Realistic 3D modeling, virtual tours, photorealistic renderings, and immersive project visualization.</p>
+        </div>
+      </div>
+      
+      <!-- Virtual Consultations -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon consultation">
+            <i class="bi bi-camera-video"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Virtual Consultations</h5>
+          <p class="text-muted">Online meetings, remote consultations, real-time collaboration via integrated Zoom technology.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Our Simple Process</h2>
+      <p class="text-muted">From consultation to completion in 4 easy steps</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">1</div>
+          <h5 class="fw-bold mb-3">Consultation</h5>
+          <p class="text-muted">Free initial consultation to understand your project requirements and vision.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">2</div>
+          <h5 class="fw-bold mb-3">Engineer Matching</h5>
+          <p class="text-muted">Connect with the perfect engineer specialist for your specific project needs.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">3</div>
+          <h5 class="fw-bold mb-3">Design & Development</h5>
+          <p class="text-muted">Collaborative design process with real-time updates and professional execution.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">4</div>
+          <h5 class="fw-bold mb-3">Delivery & Support</h5>
+          <p class="text-muted">Final delivery with ongoing support and quality assurance throughout the project.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Specialized Services -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Specialized Services</h2>
+      <p class="text-muted">Additional services for comprehensive project support</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon management">
+            <i class="bi bi-kanban"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Project Management</h5>
+          <p class="text-muted">End-to-end project coordination, timeline management, and progress tracking.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon tech">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Document Management</h5>
+          <p class="text-muted">Secure file storage, CAD files, project documentation, and digital portfolio management.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card p-4 text-center">
+          <div class="service-icon consultation">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Quality Assurance</h5>
+          <p class="text-muted">Professional review processes, quality control, and approval workflows.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature Highlights -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="feature-highlight">
+          <div class="feature-icon">
+            <i class="bi bi-award"></i>
+          </div>
+          <h3 class="fw-bold mb-3">Certified Professionals</h3>
+          <p class="text-muted mb-4">All our engineers are certified professionals with proven track records and extensive experience in their respective fields.</p>
+          <a href="{% url 'engineers_list' %}" class="btn btn-primary">Meet Our Engineers</a>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="feature-highlight">
+          <div class="feature-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h3 class="fw-bold mb-3">Proven Results</h3>
+          <p class="text-muted mb-4">Over 100+ successful projects completed with 98% client satisfaction rate and industry-leading quality standards.</p>
+          <a href="{% url 'projects' %}" class="btn btn-primary">View Our Projects</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section py-5">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3">Ready to Start Your Project?</h2>
+    <p class="lead mb-4">Join thousands of satisfied clients who have transformed their vision into reality with MAKAN</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      {% if not request.session.user_id %}
+        <a href="{% url 'login_register' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+          <i class="bi bi-person-plus me-2"></i>Get Started Today
+        </a>
+      {% else %}
+        <a href="{% url 'choose_building_stage' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+          <i class="bi bi-plus-lg me-2"></i>Start New Project
+        </a>
+      {% endif %}
+      <a href="{% url 'engineers_list' %}" class="btn btn-outline-light btn-lg rounded-pill px-5">
+        <i class="bi bi-people me-2"></i>Browse Engineers
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

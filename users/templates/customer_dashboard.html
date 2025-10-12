@@ -6,6 +6,61 @@
 <link rel="stylesheet" href="{% static 'style/style.css' %}">
 <!-- Chart.js for mini charts (optional, used below) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('dashboard-layout');
+  
+  // Sidebar scroll behavior - stop at footer
+  const sidebar = document.querySelector('.sidebar');
+  const footer = document.querySelector('.footer');
+  
+  if (sidebar && footer) {
+    let ticking = false;
+    
+    function handleSidebarScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const sidebarHeight = sidebar.offsetHeight;
+      const navbarHeight = 80;
+      
+      // Get footer position
+      const footerTop = footer.offsetTop;
+      const footerRect = footer.getBoundingClientRect();
+      const footerTopFromViewport = footerRect.top + scrollTop;
+      
+      // Calculate if sidebar would overlap footer
+      const sidebarBottomPosition = scrollTop + navbarHeight + sidebarHeight;
+      
+      if (sidebarBottomPosition >= footerTopFromViewport) {
+        // Sidebar would overlap footer, position it above footer
+        const newTop = footerTopFromViewport - sidebarHeight;
+        sidebar.style.top = Math.max(newTop, navbarHeight) + 'px';
+        sidebar.classList.add('sticky-bottom');
+      } else {
+        // Normal fixed position
+        sidebar.style.top = navbarHeight + 'px';
+        sidebar.classList.remove('sticky-bottom');
+      }
+      
+      ticking = false;
+    }
+    
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(handleSidebarScroll);
+        ticking = true;
+      }
+    }
+    
+    // Attach scroll event listener with throttling
+    window.addEventListener('scroll', requestTick);
+    window.addEventListener('resize', handleSidebarScroll);
+    
+    // Initial call
+    handleSidebarScroll();
+  }
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -16,12 +71,36 @@
       <div class="position-sticky">
         <h5 class="sidebar-heading px-2 mt-2 mb-3">Customer Dashboard</h5>
         <ul class="nav flex-column">
-          <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_ai_requests' %}">My AI Requests</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_sessions' %}">My Sessions</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_files' %}">My Files</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_3d_models' %}">3D Models</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_profile' %}">Profile</a></li>
+          <li class="nav-item mb-1">
+            <a class="nav-link {% if request.path == '/users/customer_dashboard/' %}active{% endif %} rounded" href="{% url 'customer_dashboard' %}">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item mb-1">
+            <a class="nav-link" href="{% url 'customer_ai_requests' %}">
+              <i class="bi bi-stars me-1"></i> My AI Requests
+            </a>
+          </li>
+          <li class="nav-item mb-1">
+            <a class="nav-link" href="{% url 'customer_sessions' %}">
+              <i class="bi bi-calendar-event me-1"></i> My Sessions
+            </a>
+          </li>
+          <li class="nav-item mb-1">
+            <a class="nav-link" href="{% url 'customer_files' %}">
+              <i class="bi bi-file-earmark me-1"></i> My Files
+            </a>
+          </li>
+          <li class="nav-item mb-1">
+            <a class="nav-link" href="{% url 'customer_3d_models' %}">
+              <i class="bi bi-box-seam me-1"></i> 3D Models
+            </a>
+          </li>
+          <li class="nav-item mb-1">
+            <a class="nav-link" href="{% url 'customer_profile' %}">
+              <i class="bi bi-person-circle me-1"></i> Profile
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
