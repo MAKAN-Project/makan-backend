@@ -11,6 +11,7 @@ from notifications.models import Notification
 from utils.zoom_api import create_zoom_meeting
 from django.utils.dateparse import parse_datetime
 from .models import EngineerAvailability
+from django.db.models import Q
 def dashboard(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -351,4 +352,54 @@ def upload_project_file(request, request_id):
     messages.error(request, "⚠️ No file selected.")
     return redirect('engineers_dashboard')
 
+def view_requests(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.get(user_id=user_id)
+    engineer = Engineer.objects.get(user=user)
+    project_requests = ProjectRequest.objects.filter(engineer=engineer).exclude(status='completed').order_by('-created_at')
+    sessions = Session.objects.filter(eng=engineer,scheduled_at__date=timezone.now().date()).select_related('user')
+    pending_requests_count = project_requests.filter(status='pending').count()
+    active_project_requests_count = project_requests.count()
+    completed_projects_count = File.objects.filter(user=user, status='completed').count()
+    notifications = Notification.objects.filter(
+    recipient=user
+        ).order_by('-created_at')[:10]
+    context = {
+        'active_project_requests': project_requests,
+        'sessions': sessions,
+        'pending_requests_count': pending_requests_count,
+        'active_project_requests_count': active_project_requests_count,
+        'completed_projects_count': completed_projects_count,
+        'notifications': notifications
+    }
+    return render(request, "engineers/requests.html", context)
+
+def view_sessions(request):
+    q = request.GET.get("q", "").strip()  # search query
+    status_filter = request.GET.get("status")  # filter by status
+
+    # Start with all sessions
+    sessions_qs = Session.objects.select_related("eng__user", "user").order_by('-scheduled_at')
+
+    # Filter sessions for the current engineer
+    engineer_id = request.session.get('user_id')
+    if engineer_id and request.session.get('role') == 'engineer':
+        sessions_qs = sessions_qs.filter(eng__user__user_id=engineer_id)
+
+    # Search by client name
+    if q:
+        sessions_qs = sessions_qs.filter(
+        Q(user__first_name__icontains=q) |
+        Q(user__last_name__icontains=q)
+    )
+
+    # Filter by status if provided
+    if status_filter:
+        sessions_qs = sessions_qs.filter(status=status_filter)
+
+    context = {
+        "sessions": sessions_qs,
+        "status_choices": Session.STATUS_CHOICES,
+    }
+    return render(request, "engineers/sessions_eng.html", context)
 
