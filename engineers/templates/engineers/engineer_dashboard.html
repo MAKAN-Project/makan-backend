@@ -297,9 +297,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <input type="text" class="form-control" id="file_name{{ req.request_id }}" name="file_name" placeholder="Enter file name" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="file_upload{{ req.request_id }}" class="form-label">Choose File</label>
-                                            <input type="file" class="form-control" id="file_upload{{ req.request_id }}" name="file" required>
-                                        </div>
+    <label for="file_upload{{ req.request_id }}" class="form-label">Choose File</label>
+    <input type="file" class="form-control" id="file_upload{{ req.request_id }}" name="file" required>
+</div>
+
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

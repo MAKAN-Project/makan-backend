@@ -40,7 +40,7 @@ urlpatterns = [
     path('models3d/', include('models3d.urls')),    # روابط models3d
     path('payments/', include('payments.urls')),    # روابط payments
     path('notifications/', include('notifications.urls')),
-    
+     path('serve-3d/<str:filename>/', views.serve_3d_file, name='serve_3d_file'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

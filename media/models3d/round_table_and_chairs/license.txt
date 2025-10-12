@@ -1,0 +1,11 @@
+Model Information:
+* title:	Round Table And Chairs
+* source:	https://sketchfab.com/3d-models/round-table-and-chairs-b3b1d1d338aa46ed9d480a613098e024
+* author:	vilsonpistori (https://sketchfab.com/vilsonpistori)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Round Table And Chairs" (https://sketchfab.com/3d-models/round-table-and-chairs-b3b1d1d338aa46ed9d480a613098e024) by vilsonpistori (https://sketchfab.com/vilsonpistori) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
