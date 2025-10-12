@@ -1,0 +1,123 @@
+
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Makan{% endblock %}
+
+{% block content %}
+
+<header class="py-5 bg-light border-bottom">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-8 col-xl-7 col-xxl-6">
+                <div class="my-5 text-center text-xl-start">
+                    <h1 class="display-5 fw-bolder text-dark mb-2">
+                        Connecting Vision with Engineering
+                    </h1>
+                    <p class="lead fw-normal text-muted mb-4">
+                        MAKAN is your premier digital platform, seamlessly bridging the gap between innovative architectural and interior design clients and top-tier professional engineers.
+                    </p>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+                        <a class="btn btn-warning btn-lg px-4 me-sm-3 rounded-pill fw-semibold" href="{% url 'home' %}">
+                            Explore Projects
+                        </a>
+                        <a class="btn btn-outline-dark btn-lg px-4 rounded-pill fw-semibold" href="#">
+                            Join as an Engineer
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center">
+                <img class="img-fluid rounded-3 my-5 shadow-lg" src="{% static 'images/about.png' %}" alt="Architectural design rendering" style="max-height: 400px; object-fit: cover; max-width: 480px;">
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="py-5">
+    <div class="container px-5 my-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bolder">Our Core Principles</h2>
+            <p class="lead text-muted">The foundation of every MAKAN project.</p>
+        </div>
+        <div class="row gx-5 row-cols-1 row-cols-md-3">
+            <div class="col mb-5 h-100">
+                <div class="feature bg-light bg-gradient text-warning rounded-3 mb-3 p-3 text-center">
+                    <i class="bi bi-lightbulb fs-2"></i>
+                </div>
+                <h3 class="h4 fw-bolder">Innovation</h3>
+                <p class="text-muted">We leverage cutting-edge AI and 3D technology to transform initial concepts into fully realized, optimized designs.</p>
+            </div>
+            <div class="col mb-5 h-100">
+                <div class="feature bg-light bg-gradient text-warning rounded-3 mb-3 p-3 text-center">
+                    <i class="bi bi-person-workspace fs-2"></i>
+                </div>
+                <h3 class="h4 fw-bolder">Professionalism</h3>
+                <p class="text-muted">Our platform hosts a vetted network of certified engineers, ensuring the highest standards of quality and expertise for every project.</p>
+            </div>
+            <div class="col mb-5 h-100">
+                <div class="feature bg-light bg-gradient text-warning rounded-3 mb-3 p-3 text-center">
+                    <i class="bi bi-check-circle fs-2"></i>
+                </div>
+                <h3 class="h4 fw-bolder">Transparency</h3>
+                <p class="text-muted">From initial request to project completion, we ensure clear communication and full visibility for all stakeholders.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container px-5 my-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bolder">The People Behind MAKAN</h2>
+            <p class="lead text-muted">Our dedicated leadership team and technical experts.</p>
+        </div>
+        <div class="row gx-5 row-cols-1 row-cols-sm-2 row-cols-xl-4 justify-content-center">
+            <div class="col mb-5 mb-xl-0">
+                <div class="text-center">
+                    <i class="bi bi-person fs-1 text-warning"></i>
+                    <h5 class="fw-bolder">Omayma Alkurd</h5>
+                </div>
+            </div>
+            <div class="col mb-5 mb-xl-0">
+                <div class="text-center">
+                <i class="bi bi-person fs-1 text-warning"></i>
+                    <h5 class="fw-bolder">Mahmoud Jomaa</h5>
+                </div>
+            </div>
+            <div class="col mb-5 mb-xl-0">
+                <div class="text-center">
+                <i class="bi bi-person fs-1 text-warning"></i>
+                    <h5 class="fw-bolder">Dalya Sayma</h5>
+                </div>
+            </div>
+            <div class="col mb-5 mb-xl-0">
+                <div class="text-center">
+                      <i class="bi bi-person fs-1 text-warning"></i>
+                    <h5 class="fw-bolder">Hamza Sammour</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="text-center">
+                    <h2 class="fw-bolder text-dark mb-2">Have a question?</h2>
+                    <p class="lead text-dark-50 mb-4">We're here to help you start your next project or join our network.</p>
+                    <a class="btn btn-warning btn-lg px-4 rounded-pill fw-semibold" href="#">
+                        Contact Us Today
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
