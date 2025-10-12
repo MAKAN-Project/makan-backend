@@ -474,7 +474,9 @@ def customer_projects(request):
     user = User.objects.get(user_id=user_id)
     projects = ProjectRequest.objects.filter(client=user).order_by('-created_at')
     
-    context = {'projects': projects}
+    context = {
+        'projects': projects,
+    }
     return render(request, 'customer_projects.html', context)
 
 

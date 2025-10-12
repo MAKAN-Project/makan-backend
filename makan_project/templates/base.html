@@ -50,10 +50,11 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
   <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'home' %}">Home</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Projects</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Engineers</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">AI Studio</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'projects' %}">Projects</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'engineers_list' %}">Engineers</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'services' %}">Services</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'about' %}">About</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'contact' %}">Contact</a></li>
 
   {% if request.session.user_id %}
     <!-- Notifications -->
@@ -244,11 +245,11 @@
         <div class="col-md-4">
           <h5 class="footer-title">Quick Links</h5>
           <ul class="footer-links list-unstyled">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Our Services</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'services' %}">Our Services</a></li>
+            <li><a href="{% url 'projects' %}">Portfolio</a></li>
+            <li><a href="{% url 'about' %}">About Us</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
         </div> <!-- Contact & Social -->
         <div class="col-md-4">
@@ -400,6 +401,52 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 10000);
 
   initViewButtons();
+  
+  // Navbar scroll behavior - stop at footer
+  const navbar = document.getElementById('mainNavbar');
+  const footer = document.querySelector('.footer');
+  
+  if (navbar && footer) {
+    let navbarTicking = false;
+    
+    function handleNavbarScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbarHeight = navbar.offsetHeight;
+      const footerTop = footer.offsetTop;
+      const footerRect = footer.getBoundingClientRect();
+      const footerTopFromViewport = footerRect.top + scrollTop;
+      
+      // Calculate if navbar would overlap footer
+      const navbarBottomPosition = scrollTop + navbarHeight;
+      
+      if (navbarBottomPosition >= footerTopFromViewport) {
+        // Navbar would overlap footer, position it above footer
+        const newTop = footerTopFromViewport - navbarHeight;
+        navbar.style.top = Math.max(newTop, 0) + 'px';
+        navbar.classList.add('navbar-above-footer');
+      } else {
+        // Normal fixed position
+        navbar.style.top = '0px';
+        navbar.classList.remove('navbar-above-footer');
+      }
+      
+      navbarTicking = false;
+    }
+    
+    function requestNavbarTick() {
+      if (!navbarTicking) {
+        requestAnimationFrame(handleNavbarScroll);
+        navbarTicking = true;
+      }
+    }
+    
+    // Only apply navbar scroll behavior on dashboard pages
+    if (document.body.classList.contains('dashboard-layout')) {
+      window.addEventListener('scroll', requestNavbarTick);
+      window.addEventListener('resize', handleNavbarScroll);
+      handleNavbarScroll();
+    }
+  }
 });
 </script>
 
