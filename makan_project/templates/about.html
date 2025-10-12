@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us - MAKAN{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --makan-primary: #1c2431;  /* Navy Blue */
+    --makan-accent:  #D6AE32;  /* Mustard Yellow */
+    --makan-info:    #5DAFEF;  /* Sky Blue */
+    --makan-bg:      #F4F4F4;  /* Light background */
+    --makan-text:    #0A1B2E;  /* Deep navy text */
+  }
+
+  .hero-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+    padding: 5rem 0;
+    margin-top: 76px; /* Account for fixed navbar */
+  }
+  
+  .vision-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
+    text-align: center;
+  }
+  
+  .vision-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .vision-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 3rem;
+    color: white;
+  }
+  
+  .vision-icon.mission { background: linear-gradient(135deg, var(--makan-primary), #132E4E); }
+  .vision-icon.vision { background: linear-gradient(135deg, var(--makan-accent), #B8941A); }
+  .vision-icon.values { background: linear-gradient(135deg, var(--makan-info), #4A96D1); }
+  
+  .feature-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border-left: 4px solid transparent;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  }
+  
+  .feature-card.ai { border-left-color: var(--makan-primary); }
+  .feature-card.mobile { border-left-color: var(--makan-accent); }
+  .feature-card.analytics { border-left-color: #132E4E; }
+  .feature-card.marketplace { border-left-color: #B8941A; }
+  .feature-card.sustainability { border-left-color: #4A96D1; }
+  
+  .feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature-icon.ai { background: linear-gradient(135deg, var(--makan-primary), #132E4E); }
+  .feature-icon.mobile { background: linear-gradient(135deg, var(--makan-accent), #B8941A); }
+  .feature-icon.analytics { background: linear-gradient(135deg, #132E4E, var(--makan-primary)); }
+  .feature-icon.marketplace { background: linear-gradient(135deg, #B8941A, var(--makan-accent)); }
+  .feature-icon.sustainability { background: linear-gradient(135deg, #4A96D1, var(--makan-info)); }
+  
+  .timeline {
+    position: relative;
+    padding: 2rem 0;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--makan-primary), var(--makan-accent));
+    transform: translateX(-50%);
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+  }
+  
+  .timeline-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 45%;
+    position: relative;
+  }
+  
+  .timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+    margin-right: 55%;
+  }
+  
+  .timeline-item:nth-child(even) .timeline-content {
+    margin-left: 55%;
+  }
+  
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 2rem;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--makan-accent), #B8941A);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 4px white, 0 0 0 8px var(--makan-accent);
+  }
+  
+  .stats-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+  }
+  
+  .stat-item {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: var(--makan-accent);
+  }
+  
+  .team-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .team-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .team-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--makan-primary), var(--makan-info));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: white;
+  }
+  
+  /* Color updates for text elements */
+  .text-primary {
+    color: var(--makan-primary) !important;
+  }
+  
+  .timeline-content h5 {
+    color: var(--makan-accent) !important;
+  }
+  
+  .team-card .text-primary {
+    color: var(--makan-accent) !important;
+  }
+  
+  .small.text-primary {
+    color: var(--makan-info) !important;
+  }
+  
+  @media (max-width: 768px) {
+    .timeline::before {
+      left: 30px;
+    }
+    
+    .timeline-content {
+      width: calc(100% - 60px);
+      margin-left: 60px !important;
+      margin-right: 0 !important;
+    }
+    
+    .timeline-dot {
+      left: 30px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-3 fw-bold mb-4">About MAKAN</h1>
+        <p class="lead mb-4">Revolutionizing the architecture and engineering industry through innovative technology, connecting visionary professionals with ambitious clients</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="{% url 'services' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+            <i class="bi bi-tools me-2"></i>Our Services
+          </a>
+          <a href="{% url 'engineers_list' %}" class="btn btn-outline-light btn-lg rounded-pill px-5">
+            <i class="bi bi-people me-2"></i>Meet Our Team
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mission, Vision, Values -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Our Foundation</h2>
+      <p class="text-muted">The principles that drive everything we do</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="vision-card">
+          <div class="vision-icon mission">
+            <i class="bi bi-target"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Our Mission</h4>
+          <p class="text-muted">To democratize access to world-class architectural and engineering expertise by creating a seamless platform that connects talented professionals with clients who dare to dream big.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="vision-card">
+          <div class="vision-icon vision">
+            <i class="bi bi-eye"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Our Vision</h4>
+          <p class="text-muted">To become the global leader in intelligent design collaboration, where AI-powered tools and human creativity converge to build the sustainable cities and spaces of tomorrow.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="vision-card">
+          <div class="vision-icon values">
+            <i class="bi bi-heart"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Our Values</h4>
+          <p class="text-muted">Innovation, integrity, sustainability, and collaboration. We believe in creating spaces that not only inspire but also respect our planet and future generations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-item">
+          <span class="stat-number">1000+</span>
+          <span>Completed Projects</span>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-item">
+          <span class="stat-number">500+</span>
+          <span>Expert Engineers</span>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-item">
+          <span class="stat-number">50+</span>
+          <span>Countries Served</span>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-item">
+          <span class="stat-number">98%</span>
+          <span>Client Satisfaction</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Future Features -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">The Future of MAKAN</h2>
+      <p class="text-muted">Cutting-edge features coming soon to revolutionize your design experience</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card ai">
+          <div class="feature-icon ai">
+            <i class="bi bi-robot"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Advanced AI Design Assistant</h5>
+          <p class="text-muted mb-3">Next-generation AI that understands architectural principles and provides intelligent design suggestions in real-time.</p>
+          <div class="small text-primary">Coming Q2 2026</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card mobile">
+          <div class="feature-icon mobile">
+            <i class="bi bi-phone"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Mobile App Suite</h5>
+          <p class="text-muted mb-3">Full-featured mobile applications for iOS and Android, enabling design collaboration on the go.</p>
+          <div class="small text-primary">Coming Q1 2026</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card analytics">
+          <div class="feature-icon analytics">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Smart Analytics Dashboard</h5>
+          <p class="text-muted mb-3">Comprehensive analytics and insights for project performance, cost optimization, and efficiency tracking.</p>
+          <div class="small text-primary">Coming Q4 2025</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card marketplace">
+          <div class="feature-icon marketplace">
+            <i class="bi bi-shop"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Materials Marketplace</h5>
+          <p class="text-muted mb-3">Integrated marketplace for sourcing sustainable building materials and connecting with verified suppliers.</p>
+          <div class="small text-primary">Coming Q2 2026</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card sustainability">
+          <div class="feature-icon sustainability">
+            <i class="bi bi-leaf"></i>
+          </div>
+          <h5 class="fw-bold mb-3">Sustainability Tracker</h5>
+          <p class="text-muted mb-3">AI-powered sustainability assessment tools to measure and optimize the environmental impact of every design.</p>
+          <div class="small text-primary">Coming Q1 2027</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Development Timeline -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Our Journey</h2>
+      <p class="text-muted">Key milestones in MAKAN's evolution</p>
+    </div>
+    
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h5 class="fw-bold text-primary">2024 - Foundation</h5>
+          <p class="mb-0">MAKAN was founded with the vision of connecting skilled engineers with ambitious projects worldwide.</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h5 class="fw-bold text-primary">2025 - Platform Launch</h5>
+          <p class="mb-0">Official launch of the MAKAN platform with AI-powered matching, 3D visualization, and virtual consultations.</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h5 class="fw-bold text-primary">2026 - Global Expansion</h5>
+          <p class="mb-0">International expansion with mobile apps, VR integration, and partnerships with leading architecture firms.</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h5 class="fw-bold text-primary">2027 - Sustainability Focus</h5>
+          <p class="mb-0">Launch of comprehensive sustainability tools and green building certification programs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leadership Team -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Leadership Team</h2>
+      <p class="text-muted">Meet the visionaries behind MAKAN</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Mahmoud Shuman</h5>
+          <p class="text-primary mb-2">CEO & Co-Founder</p>
+          <p class="text-muted small">Visionary leader with extensive experience in architecture and technology innovation</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Omyma Alkurd</h5>
+          <p class="text-primary mb-2">CTO & Co-Founder</p>
+          <p class="text-muted small">Technology expert specializing in AI-driven design solutions and platform development</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Dalia Saymeh</h5>
+          <p class="text-primary mb-2">Head of Engineering</p>
+          <p class="text-muted small">Senior engineer with expertise in structural design and sustainable architecture</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Hamza Sammour</h5>
+          <p class="text-primary mb-2">Head of Operations</p>
+          <p class="text-muted small">Operations specialist focused on platform optimization and client success</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3">Ready to Build the Future?</h2>
+    <p class="lead mb-4">Join thousands of professionals and clients who are already transforming the world through innovative design</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      {% if not request.session.user_id %}
+        <a href="{% url 'login_register' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+          <i class="bi bi-person-plus me-2"></i>Join MAKAN Today
+        </a>
+      {% else %}
+        <a href="{% url 'choose_building_stage' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+          <i class="bi bi-plus-lg me-2"></i>Start Your Project
+        </a>
+      {% endif %}
+      <a href="{% url 'services' %}" class="btn btn-outline-light btn-lg rounded-pill px-5">
+        <i class="bi bi-info-circle me-2"></i>Learn More
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

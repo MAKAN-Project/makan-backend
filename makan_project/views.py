@@ -88,4 +88,193 @@ def home(request):
     })
 
 
+def projects(request):
+    """Display all projects with filtering by engineering specialization"""
+    specialization_filter = request.GET.get('specialization', '')
+    
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Filter projects based on specialization - show only completed projects
+    if specialization_filter:
+        projects = ProjectRequest.objects.filter(
+            engineer__specialization=specialization_filter,
+            status='completed'
+        ).select_related('engineer', 'engineer__user', 'client').order_by('-created_at')
+    else:
+        projects = ProjectRequest.objects.filter(
+            status='completed'
+        ).select_related('engineer', 'engineer__user', 'client').order_by('-created_at')
+    
+    # Get display name for current filter
+    specialization_choices = dict(Engineer.SPECIALIZATION_CHOICES)
+    current_filter_display = specialization_choices.get(specialization_filter, 'All Projects')
+    
+    context = {
+        'projects': projects,
+        'current_filter': specialization_filter,
+        'current_filter_display': current_filter_display,
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'projects.html', context)
+
+
+def engineers_list(request):
+    """Display all approved engineers with filtering by specialization"""
+    specialization_filter = request.GET.get('specialization', '')
+    
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Filter engineers based on specialization - show only approved engineers
+    if specialization_filter:
+        engineers = Engineer.objects.filter(
+            specialization=specialization_filter,
+            status='approved'
+        ).select_related('user').order_by('-created_at')
+    else:
+        engineers = Engineer.objects.filter(
+            status='approved'
+        ).select_related('user').order_by('-created_at')
+    
+    # Get display name for current filter
+    specialization_choices = dict(Engineer.SPECIALIZATION_CHOICES)
+    current_filter_display = specialization_choices.get(specialization_filter, 'All Engineers')
+    
+    context = {
+        'engineers': engineers,
+        'current_filter': specialization_filter,
+        'current_filter_display': current_filter_display,
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'engineers_list.html', context)
+
+
+def services(request):
+    """Display comprehensive services page"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    context = {
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'services.html', context)
+
+
+def about(request):
+    """Display comprehensive about page with vision and future features"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    context = {
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'about.html', context)
+
+
+def contact(request):
+    """Display contact page with team member information"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Team members information
+    team_members = [
+        {
+            'name': 'Mahmoud Shuman',
+            'role': 'CEO & Co-Founder',
+            'email': 'mahmoud.shuman@outlook.com',
+            'description': 'Visionary leader with extensive experience in architecture and technology innovation'
+        },
+        {
+            'name': 'Omyma Alkurd',
+            'role': 'CTO & Co-Founder',
+            'email': 'omyma_1994@hotmail.com',
+            'description': 'Technology expert specializing in AI-driven design solutions and platform development'
+        },
+        {
+            'name': 'Dalia Saymeh',
+            'role': 'Head of Engineering',
+            'email': 'dalia.saymeh@makan.com',
+            'description': 'Senior engineer with expertise in structural design and sustainable architecture'
+        },
+        {
+            'name': 'Hamza Sammour',
+            'role': 'Head of Operations',
+            'email': 'hamza.sammour@makan.com',
+            'description': 'Operations specialist focused on platform optimization and client success'
+        }
+    ]
+    
+    context = {
+        'pending_notifications': pending_notifications,
+        'team_members': team_members,
+    }
+    
+    return render(request, 'contact.html', context)
+
+
 

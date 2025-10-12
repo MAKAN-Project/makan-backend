@@ -26,6 +26,11 @@ urlpatterns = [
     #path('admin/', admin.site.urls),
     path('admin/', admin.site.urls),  
     path('', views.home, name='home'),              # لوحة الإدارة
+    path('projects/', views.projects, name='projects'),  # Projects page
+    path('our-engineers/', views.engineers_list, name='engineers_list'),  # Engineers page
+    path('services/', views.services, name='services'),  # Services page
+    path('about/', views.about, name='about'),  # About page
+    path('contact/', views.contact, name='contact'),  # Contact page
     path('sessions/', include('sessions_app.urls')), # كل روابط جلساتك
     path('users/', include('users.urls')),          # روابط users
     path('requests/', include('airequests.urls')),  # روابط airequests
