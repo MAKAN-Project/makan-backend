@@ -52,9 +52,9 @@
           class="navbar-toggler-icon"></span> </button>
       <div class="collapse navbar-collapse justify-content-end" id="navMenu">
         <ul class="navbar-nav mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link fw-semibold" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link fw-semibold" href="#">Projects</a></li>
-          <li class="nav-item"><a class="nav-link fw-semibold" href="#">Engineers</a></li>
+          <li class="nav-item"><a class="nav-link fw-semibold" href="{% url 'home' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link fw-semibold" href="{% url 'projects' %}">Projects</a></li>
+          <li class="nav-item"><a class="nav-link fw-semibold" href="{% url 'engineers_list' %}">Engineers</a></li>
           <li class="nav-item"><a class="nav-link fw-semibold" href="#">AI Studio</a></li>
           <li class="nav-item"><a class="nav-link fw-semibold" href="#">About</a></li>
           <li class="nav-item ms-lg-3">
@@ -233,11 +233,11 @@
         <div class="col-md-4">
           <h5 class="footer-title">Quick Links</h5>
           <ul class="footer-links list-unstyled">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Our Services</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'services' %}">Our Services</a></li>
+            <li><a href="{% url 'projects' %}">Portfolio</a></li>
+            <li><a href="{% url 'about' %}">About Us</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
         </div> <!-- Contact & Social -->
         <div class="col-md-4">

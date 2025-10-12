@@ -11,6 +11,7 @@ from notifications.models import Notification
 from utils.zoom_api import create_zoom_meeting
 from django.utils.dateparse import parse_datetime
 from .models import EngineerAvailability
+from django.db.models import Q
 def dashboard(request):
     user_id = request.session.get('user_id')
     if not user_id:

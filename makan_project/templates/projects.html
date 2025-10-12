@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Projects - MAKAN{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --makan-primary: #1c2431;  /* Navy Blue */
+    --makan-accent:  #D6AE32;  /* Mustard Yellow */
+    --makan-info:    #5DAFEF;  /* Sky Blue */
+    --makan-bg:      #F4F4F4;  /* Light background */
+    --makan-text:    #0A1B2E;  /* Deep navy text */
+  }
+
+  .filter-section {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-top: 76px; /* Account for fixed navbar */
+  }
+  
+  .project-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  
+  .project-image {
+    height: 250px;
+    width: 100%;
+    border-radius: 15px 15px 0 0;
+    object-fit: cover;
+  }
+  
+  /* For gradient fallback images */
+  .project-image.project-bg-architecture,
+  .project-image.project-bg-interior,
+  .project-image.project-bg-civil,
+  .project-image.project-bg-mechanical,
+  .project-image.project-bg-default {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .project-image-wrapper {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+  }
+  
+  /* Background gradients for each specialization */
+  .project-bg-architecture {
+    background: linear-gradient(135deg, var(--makan-primary) 0%, #132E4E 100%);
+  }
+  
+  .project-bg-interior {
+    background: linear-gradient(135deg, var(--makan-accent) 0%, #B8941A 100%);
+  }
+  
+  .project-bg-civil {
+    background: linear-gradient(135deg, var(--makan-info) 0%, #4A96D1 100%);
+  }
+  
+  .project-bg-mechanical {
+    background: linear-gradient(135deg, #132E4E 0%, var(--makan-primary) 100%);
+  }
+  
+  .project-bg-default {
+    background: linear-gradient(135deg, var(--makan-accent) 0%, #D6AE32 100%);
+  }
+  
+  .project-icon {
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Add some decorative elements */
+  .project-bg-architecture::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    background-size: 50px 50px;
+    opacity: 0.3;
+    animation: float 20s infinite linear;
+  }
+  
+  .project-bg-interior::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    background-size: 40px 40px;
+    opacity: 0.3;
+    animation: float 15s infinite linear;
+  }
+  
+  .project-bg-civil::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255,255,255,0.1) 10px,
+      rgba(255,255,255,0.1) 20px
+    );
+    opacity: 0.5;
+  }
+  
+  .project-bg-mechanical::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    background-size: 60px 60px;
+    opacity: 0.3;
+    animation: rotate 30s infinite linear;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Project Overlay */
+  .project-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+  
+  .badge-specialization {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+  }
+  
+  .engineer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .filter-btn {
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    background: transparent;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    margin: 0.25rem;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: white;
+    color: var(--makan-primary);
+    border-color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<section class="filter-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold mb-3">Completed Projects</h1>
+        <p class="lead mb-4">Explore our successfully completed architectural and engineering projects</p>
+        
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+          <form method="GET" action="{% url 'projects' %}" id="filterForm">
+            <button type="submit" name="specialization" value="" class="btn filter-btn {% if not current_filter %}active{% endif %}">
+              All Completed Projects
+            </button>
+            <button type="submit" name="specialization" value="architecture" class="btn filter-btn {% if current_filter == 'architecture' %}active{% endif %}">
+              Architecture
+            </button>
+            <button type="submit" name="specialization" value="interior" class="btn filter-btn {% if current_filter == 'interior' %}active{% endif %}">
+              Interior Design
+            </button>
+            <button type="submit" name="specialization" value="civil" class="btn filter-btn {% if current_filter == 'civil' %}active{% endif %}">
+              Civil Engineering
+            </button>
+            <button type="submit" name="specialization" value="mechanical" class="btn filter-btn {% if current_filter == 'mechanical' %}active{% endif %}">
+              Mechanical Engineering
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Projects Grid -->
+<section class="py-5">
+  <div class="container">
+    {% if projects %}
+      <!-- Results Info -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <p class="text-muted">
+            {% if current_filter %}
+              Showing {{ projects|length }} completed project{{ projects|length|pluralize }} in {{ current_filter_display }}
+            {% else %}
+              Showing all {{ projects|length }} completed project{{ projects|length|pluralize }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      
+      <!-- Projects Grid -->
+      <div class="row g-4">
+        {% for project in projects %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card project-card shadow-sm">
+            <div class="position-relative">
+              <!-- Project Image -->
+              {% if project.project_image %}
+                <img src="{{ project.project_image.url }}" alt="Project {{ project.request_id }}" class="project-image">
+              {% else %}
+                <!-- Fallback to gradient backgrounds for projects without images -->
+                <div class="project-image-wrapper">
+                  {% if project.engineer.specialization == 'architecture' %}
+                    <div class="project-image project-bg-architecture">
+                      <div class="project-icon">
+                        <i class="bi bi-building" style="font-size: 4rem; color: white;"></i>
+                      </div>
+                    </div>
+                  {% elif project.engineer.specialization == 'interior' %}
+                    <div class="project-image project-bg-interior">
+                      <div class="project-icon">
+                        <i class="bi bi-house-door" style="font-size: 4rem; color: white;"></i>
+                      </div>
+                    </div>
+                  {% elif project.engineer.specialization == 'civil' %}
+                    <div class="project-image project-bg-civil">
+                      <div class="project-icon">
+                        <i class="bi bi-blueprint" style="font-size: 4rem; color: white;"></i>
+                      </div>
+                    </div>
+                  {% elif project.engineer.specialization == 'mechanical' %}
+                    <div class="project-image project-bg-mechanical">
+                      <div class="project-icon">
+                        <i class="bi bi-gear-fill" style="font-size: 4rem; color: white;"></i>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="project-image project-bg-default">
+                      <div class="project-icon">
+                        <i class="bi bi-house-fill" style="font-size: 4rem; color: white;"></i>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              <!-- Project Type Overlay -->
+              <div class="project-overlay">
+                {% if project.engineer.specialization == 'architecture' %}
+                  3D Architecture
+                {% elif project.engineer.specialization == 'interior' %}
+                  Interior Design
+                {% elif project.engineer.specialization == 'civil' %}
+                  Engineering Plans
+                {% elif project.engineer.specialization == 'mechanical' %}
+                  Mechanical Systems
+                {% else %}
+                  Project
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="card-body p-4">
+              <!-- Specialization Badge -->
+              <div class="mb-3">
+                {% if project.engineer.specialization == 'architecture' %}
+                  <span class="badge badge-specialization bg-primary">Architecture</span>
+                {% elif project.engineer.specialization == 'interior' %}
+                  <span class="badge badge-specialization bg-success">Interior Design</span>
+                {% elif project.engineer.specialization == 'civil' %}
+                  <span class="badge badge-specialization bg-warning">Civil Engineering</span>
+                {% elif project.engineer.specialization == 'mechanical' %}
+                  <span class="badge badge-specialization bg-info">Mechanical Engineering</span>
+                {% endif %}
+              </div>
+              
+              <!-- Project Title -->
+              <h5 class="card-title fw-bold mb-3">Project #{{ project.request_id }}</h5>
+              
+              <!-- Project Description -->
+              <p class="card-text text-muted mb-3">
+                {{ project.description|truncatechars:120 }}
+              </p>
+              
+              <!-- Engineer Info -->
+              <div class="d-flex align-items-center mb-3">
+                {% if project.engineer.profile_photo %}
+                  <img src="{{ project.engineer.profile_photo.url }}" alt="Engineer" class="engineer-avatar me-3">
+                {% else %}
+                  <div class="engineer-avatar bg-light d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-person text-muted"></i>
+                  </div>
+                {% endif %}
+                <div>
+                  <h6 class="mb-0">{{ project.engineer.user.first_name }} {{ project.engineer.user.last_name }}</h6>
+                  <small class="text-muted">{{ project.engineer.get_specialization_display }}</small>
+                </div>
+              </div>
+              
+              <!-- Project Status & Date -->
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-success">Completed</span>
+                <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+    {% else %}
+      <!-- No Projects Found -->
+      <div class="text-center py-5">
+        <i class="bi bi-folder-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">No Completed Projects Found</h4>
+        <p class="text-muted">
+          {% if current_filter %}
+            No completed projects found for {{ current_filter_display }}. Try a different filter.
+          {% else %}
+            There are no completed projects to display at the moment.
+          {% endif %}
+        </p>
+        {% if current_filter %}
+          <a href="{% url 'projects' %}" class="btn btn-primary mt-3">View All Completed Projects</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-light">
+  <div class="container text-center">
+    <h3 class="fw-bold mb-3">Ready to Start Your Project?</h3>
+    <p class="text-muted mb-4">Connect with our talented engineers and bring your vision to life</p>
+    {% if not request.session.user_id %}
+      <a href="{% url 'login_register' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+        <i class="bi bi-person-plus me-2"></i>Get Started Today
+      </a>
+    {% else %}
+      <a href="{% url 'choose_building_stage' %}" class="btn btn-warning btn-lg rounded-pill px-5">
+        <i class="bi bi-plus-lg me-2"></i>Start New Project
+      </a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

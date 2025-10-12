@@ -5,6 +5,13 @@ from files.models import File
 from sessions_app.models import Session
 from engineers.models import EngineerAvailability
 
+# Validator for project images
+def validate_project_image(file):
+    max_size = 5 * 1024 * 1024  # 5MB
+    if file.size > max_size:
+        from django.core.exceptions import ValidationError
+        raise ValidationError("Project image size must not exceed 5MB")
+
 class ProjectRequest(models.Model):
     request_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project_requests')
@@ -18,6 +25,13 @@ class ProjectRequest(models.Model):
             ('completed', 'Completed'),
         ],
         default='pending'
+    )
+    project_image = models.ImageField(
+        upload_to='projects/images/',
+        blank=True,
+        null=True,
+        validators=[validate_project_image],
+        help_text="Upload an image showcasing this completed project"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     session = models.OneToOneField(

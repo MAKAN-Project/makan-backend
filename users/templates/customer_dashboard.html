@@ -6,6 +6,61 @@
 <link rel="stylesheet" href="{% static 'style/style.css' %}">
 <!-- Chart.js for mini charts (optional, used below) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('dashboard-layout');
+  
+  // Sidebar scroll behavior - stop at footer
+  const sidebar = document.querySelector('.sidebar');
+  const footer = document.querySelector('.footer');
+  
+  if (sidebar && footer) {
+    let ticking = false;
+    
+    function handleSidebarScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const sidebarHeight = sidebar.offsetHeight;
+      const navbarHeight = 80;
+      
+      // Get footer position
+      const footerTop = footer.offsetTop;
+      const footerRect = footer.getBoundingClientRect();
+      const footerTopFromViewport = footerRect.top + scrollTop;
+      
+      // Calculate if sidebar would overlap footer
+      const sidebarBottomPosition = scrollTop + navbarHeight + sidebarHeight;
+      
+      if (sidebarBottomPosition >= footerTopFromViewport) {
+        // Sidebar would overlap footer, position it above footer
+        const newTop = footerTopFromViewport - sidebarHeight;
+        sidebar.style.top = Math.max(newTop, navbarHeight) + 'px';
+        sidebar.classList.add('sticky-bottom');
+      } else {
+        // Normal fixed position
+        sidebar.style.top = navbarHeight + 'px';
+        sidebar.classList.remove('sticky-bottom');
+      }
+      
+      ticking = false;
+    }
+    
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(handleSidebarScroll);
+        ticking = true;
+      }
+    }
+    
+    // Attach scroll event listener with throttling
+    window.addEventListener('scroll', requestTick);
+    window.addEventListener('resize', handleSidebarScroll);
+    
+    // Initial call
+    handleSidebarScroll();
+  }
+});
+</script>
 {% endblock %}
 
 {% block content %}
