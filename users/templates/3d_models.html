@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}3D Room Planner - MAKAN{% endblock %}
+{% load static %}
+
+{% block extra_head %}
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+  .planner-container {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .furniture-panel {
+    width: 260px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .furniture-item {
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    background: #fafafa;
+    cursor: grab;
+    transition: 0.3s;
+  }
+
+  .furniture-item:hover {
+    background: #f2f2f2;
+  }
+
+  .workspace {
+    flex: 1;
+    position: relative;
+    height: 80vh;
+    border-radius: 12px;
+    background: #f0f0f0;
+    overflow: hidden;
+  }
+
+  .workspace img.bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .workspace .drop-zone {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  model-viewer {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    cursor: grab;
+    z-index: 10;
+  }
+
+  model-viewer:active {
+    cursor: grabbing;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h3 class="fw-bold text-primary mb-3">🏠 3D Room Designer</h3>
+  <p class="text-muted">Upload your room image and drag & rotate 3D furniture models.</p>
+
+  <div class="mb-3">
+    <input type="file" id="bgUploader" class="form-control" accept="image/*">
+  </div>
+
+  <div class="planner-container">
+    <!-- 🪑 Furniture panel -->
+    <div class="furniture-panel shadow-sm">
+      <h6 class="fw-bold text-center mb-3">🪑 3D Furniture</h6>
+      {% for item in furniture %}
+        {% if item.model_file %}
+          <div class="furniture-item" draggable="true" data-model="{{ item.model_file.url }}">
+            🪑 {{ item.name }}
+          </div>
+        {% else %}
+          <div class="text-danger small">⚠ لا يوجد ملف لهذا العنصر</div>
+        {% endif %}
+      {% empty %}
+        <p class="text-muted text-center">No 3D models found.</p>
+      {% endfor %}
+    </div>
+
+    <!-- 🎨 Workspace -->
+    <div class="workspace shadow-sm">
+      <img id="roomBg" class="bg" src="" alt="">
+      <div class="drop-zone" id="dropZone"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const uploader = document.getElementById('bgUploader');
+  const bg = document.getElementById('roomBg');
+  const dropZone = document.getElementById('dropZone');
+
+  // ✅ Upload background image
+  uploader.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { bg.src = reader.result; };
+    reader.readAsDataURL(file);
+  });
+
+  // ✅ Start dragging from sidebar
+  document.querySelectorAll('.furniture-item').forEach(item => {
+    item.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('model', item.dataset.model);
+    });
+  });
+
+  // ✅ Drop model into workspace
+  dropZone.addEventListener('dragover', (e) => e.preventDefault());
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const modelUrl = e.dataTransfer.getData('model');
+    if (!modelUrl) return;
+
+    const rect = dropZone.getBoundingClientRect();
+    const x = e.clientX - rect.left - 75;
+    const y = e.clientY - rect.top - 75;
+
+    // 🪑 Create model-viewer dynamically
+    const model = document.createElement('model-viewer');
+    model.src = modelUrl;
+    model.setAttribute('camera-controls', '');
+    model.setAttribute('shadow-intensity', '1');
+    
+    model.style.transform = 'scale(2)';
+    model.style.left = `${x}px`;
+    model.style.top = `${y}px`;
+
+    dropZone.appendChild(model);
+
+    // ✅ Enable dragging inside workspace
+    let offsetX, offsetY;
+    model.addEventListener('mousedown', (ev) => {
+      ev.preventDefault();
+      offsetX = ev.offsetX;
+      offsetY = ev.offsetY;
+      model.style.zIndex = 20;
+
+      function moveHandler(moveEvent) {
+        model.style.left = `${moveEvent.clientX - rect.left - offsetX}px`;
+        model.style.top = `${moveEvent.clientY - rect.top - offsetY}px`;
+      }
+
+      function upHandler() {
+        window.removeEventListener('mousemove', moveHandler);
+        window.removeEventListener('mouseup', upHandler);
+        model.style.zIndex = 10;
+      }
+
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseup', upHandler);
+    });
+  });
+});
+</script>
+{% endblock %}

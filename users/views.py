@@ -164,13 +164,15 @@ def reserve_session(request):
                 )
 
         # ✅ إنشاء الجلسة (Session)
-        Session.objects.create(
+        session=Session.objects.create(
             user=client,
             eng=engineer,
             scheduled_at=scheduled_at,
             status="pending"
         )
 
+        project_request.session = session
+        project_request.save()
         # ✅ تحديث الـ Slot
         slot.is_booked = True
         slot.save()
@@ -321,6 +323,7 @@ def customer_dashboard(request):
         recipient=user
     ).order_by('-created_at')[:5]
 
+    
     # --- جلسات اليوم ---
     today_sessions = Session.objects.filter(
         user_id=user_id,
@@ -457,10 +460,21 @@ def customer_sessions(request):
     return render(request, "sessions.html", context)
 
 
+# views.py
 def customer_3d_models(request):
-    from models3d.models import Model3D
-    models = Model3D.objects.filter(user_id=request.session.get('user_id'))
-    return render(request, 'customer_3d_models.html', {'models': models})
+    # 🧩 تحقق من السيشن
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login_register')  # غيّر الاسم حسب اسم صفحة تسجيل الدخول عندك
+
+    # 📦 احضر المستخدم
+    user = User.objects.get(user_id=user_id)
+
+    # 🪑 احضر النماذج ثلاثية الأبعاد الخاصة به أو المتاحة للجميع
+    furniture = Model3D.objects.filter(model_file__isnull=False).exclude(model_file='')
+
+    # 🎨 أرسلها للصفحة
+    return render(request, '3d_models.html', {'furniture': furniture, 'user': user})
 
 
 def customer_profile(request):

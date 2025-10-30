@@ -25,7 +25,12 @@ from . import views
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('admin/', admin.site.urls),  
-    path('', views.home, name='home'),              # لوحة الإدارة
+    path('', views.home, name='home'),    
+    path('projects/', views.projects, name='projects'),  # Projects page
+    path('our-engineers/', views.engineers_list, name='engineers_list'),  # Engineers page
+    path('services/', views.services, name='services'),  # Services page
+    path('about/', views.about, name='about'),  # About page
+    path('contact/', views.contact, name='contact'),  # Contact page          # لوحة الإدارة
     path('sessions/', include('sessions_app.urls')), # كل روابط جلساتك
     path('users/', include('users.urls')),          # روابط users
     path('requests/', include('airequests.urls')),  # روابط airequests
@@ -35,7 +40,7 @@ urlpatterns = [
     path('models3d/', include('models3d.urls')),    # روابط models3d
     path('payments/', include('payments.urls')),    # روابط payments
     path('notifications/', include('notifications.urls')),
-    
+     path('serve-3d/<str:filename>/', views.serve_3d_file, name='serve_3d_file'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

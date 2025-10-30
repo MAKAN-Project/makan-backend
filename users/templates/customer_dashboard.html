@@ -6,25 +6,64 @@
 <link rel="stylesheet" href="{% static 'style/style.css' %}">
 <!-- Chart.js for mini charts (optional, used below) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 {% endblock %}
 
 {% block content %}
+
+
+
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar (keep as you had) -->
-    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
-      <div class="position-sticky">
-        <h5 class="sidebar-heading px-2 mt-2 mb-3">Customer Dashboard</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item"><a class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_ai_requests' %}">My AI Requests</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_sessions' %}">My Sessions</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_files' %}">My Files</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_3d_models' %}">3D Models</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'customer_profile' %}">Profile</a></li>
-        </ul>
-      </div>
-    </nav>
+    <!-- Sidebar -->
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+  <div class="position-sticky pt-3">
+    <h5 class="sidebar-heading px-3 mt-2 mb-3 text-primary" style="color:#ffc107 ;">Customer Dashboard</h5>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a  class="nav-link {% if request.path == '/customer/dashboard/' %}active{% endif %}" href="{% url 'customer_dashboard' %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_ai_requests' %}">
+          <i class="bi bi-stars me-2"></i> My AI Requests
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_sessions' %}">
+          <i class="bi bi-calendar-event me-2"></i> My Sessions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_files' %}">
+          <i class="bi bi-folder me-2"></i> My Files
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_3d_models' %}">
+          <i class="bi bi-box-seam me-2"></i> 3D Models
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customer_profile' %}">
+          <i class="bi bi-person me-2"></i> Profile
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Toggle button for mobile -->
+<nav class="navbar navbar-light bg-light d-md-none shadow-sm mb-3">
+  <div class="container-fluid">
+    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+      <i class="bi bi-list"></i> Menu
+    </button>
+  </div>
+</nav>
+
 
     <!-- Main -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
@@ -49,7 +88,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-body text-center">
               <i class="bi bi-calendar-event text-primary fs-2 mb-2"></i>
-              <h5 class="mb-0">{{ today_sessions_count }}</h5>
+              <h5 class="mb-0">2</h5>
               <small class="text-muted">Today's Sessions</small>
               <canvas id="chartSessions" height="40" class="mt-2"></canvas>
             </div>
@@ -59,7 +98,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-body text-center">
               <i class="bi bi-clipboard-data text-success fs-2 mb-2"></i>
-              <h5 class="mb-0">{{ project_requests_count }}</h5>
+              <h5 class="mb-0">15</h5>
               <small class="text-muted">Project Requests</small>
               <canvas id="chartRequests" height="40" class="mt-2"></canvas>
             </div>
@@ -69,7 +108,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-body text-center">
               <i class="bi bi-check-circle text-warning fs-2 mb-2"></i>
-              <h5 class="mb-0">{{ completed_projects_count }}</h5>
+              <h5 class="mb-0">10</h5>
               <small class="text-muted">Completed Projects</small>
               <canvas id="chartCompleted" height="40" class="mt-2"></canvas>
             </div>
@@ -79,7 +118,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-body text-center">
               <i class="bi bi-folder text-danger fs-2 mb-2"></i>
-              <h5 class="mb-0">{{ total_files_count }}</h5>
+              <h5 class="mb-0">30</h5>
               <small class="text-muted">Uploaded Files</small>
               <canvas id="chartFiles" height="40" class="mt-2"></canvas>
             </div>
@@ -93,7 +132,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h6 class="mb-0"><i class="bi bi-bell me-2 text-primary"></i> Recent Notifications</h6>
-              <a href="{% url 'notifications_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+              <a href="{% url 'notifications_page' %}" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body">
               {% if notifications %}
@@ -101,7 +140,7 @@
                   {% for note in notifications|slice:":3" %}
                     <li class="py-2 border-bottom d-flex justify-content-between align-items-start">
                       <div>
-                        <p class="mb-1 fw-semibold">{{ note.message }}</p>
+                        <p class="mb-1 fw-semibold">{{ note.message|safe }}</p>
                         <small class="text-muted">{{ note.created_at|timesince }} ago</small>
                       </div>
                       {% if not note.is_read %}

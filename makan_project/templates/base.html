@@ -9,6 +9,7 @@
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -27,6 +28,27 @@
 }
 .notification-message a:hover {
   text-decoration: underline;
+}
+</style>
+
+<style>
+/* 🟢 اللون حسب نوع الإشعار */
+.modal-header.project_request {
+  background-color: #0d6efd !important; /* أزرق */
+}
+.modal-header.file_uploaded {
+  background-color: #198754 !important; /* أخضر */
+}
+.modal-header.zoom_meeting {
+  background-color: #ffc107 !important; /* أصفر */
+}
+.modal-header.generic {
+  background-color: #6c757d !important; /* رمادي */
+}
+
+/* عنوان المودال */
+#requestModal .modal-title i {
+  margin-right: 6px;
 }
 </style>
 
@@ -50,10 +72,11 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
   <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'home' %}">Home</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Projects</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">Engineers</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">AI Studio</a></li>
-  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="#">About</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'projects' %}">Projects</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'engineers_list' %}">Engineers</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'services' %}">Services</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'about' %}">About</a></li>
+  <li class="nav-item"><a class="nav-link fw-semibold text-dark px-3" href="{% url 'contact' %}">Contact</a></li>
 
   {% if request.session.user_id %}
     <!-- Notifications -->
@@ -81,23 +104,31 @@
             </div>
 
             {% if notif.project_request %}
-            <button
+           <button
   class="btn btn-sm btn-outline-primary view-request-btn"
   data-notif-id="{{ notif.id }}"
+  data-type="{{ notif.type }}"
   data-bs-toggle="modal"
   data-bs-target="#requestModal"
-  data-request-id="{{ notif.project_request.request_id }}"
-  data-description="{{ notif.project_request.description|escape }}"
-  data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
-  data-accept-url="{% url 'accept_project_request' notif.project_request.request_id %}"
-  data-reject-url="{% url 'reject_project_request' notif.project_request.request_id %}"
-  data-scheduled-at="{{ notif.project_request.session.scheduled_at|date:'c' }}"
-  data-zoom-link="{{ notif.project_request.session.meeting_link }}"
-  {% if notif.project_request.file %}
-  data-file-url="{{ notif.project_request.file.url }}"
-  {% endif %}>
+
+  {% if notif.project_request %}
+    data-request-id="{{ notif.project_request.request_id }}"
+    data-description="{{ notif.project_request.description|escape }}"
+    data-client="{{ notif.project_request.client.first_name }} {{ notif.project_request.client.last_name }}"
+    data-accept-url="{% url 'accept_project_request' notif.project_request.request_id %}"
+    data-reject-url="{% url 'reject_project_request' notif.project_request.request_id %}"
+    data-scheduled-at="{{ notif.project_request.session.scheduled_at|date:'c'|default_if_none:'' }}"
+    data-zoom-link="{{ notif.project_request.session.meeting_link|default_if_none:'' }}"
+    {% with notif.project_request.files.last as latest_file %}
+      {% if latest_file %}
+        data-file-url="{{ latest_file.file.url }}"
+      {% endif %}
+    {% endwith %}
+  {% endif %}
+>
   View
 </button>
+
 
             {% endif %}
           </li>
@@ -167,14 +198,30 @@
               <p class="mb-1 text-muted small">Description</p>
               <div id="modalDescription" class="p-3 bg-white border rounded small shadow-sm"></div>
             </div>
-
+            
             <!-- Attached File -->
-            <div id="modalFileContainer" class="col-12 d-none">
-              <p class="mb-1 text-muted small">Attached File</p>
-              <a id="modalFile" href="#" target="_blank" class="fw-semibold text-primary text-decoration-none">
-                <i class="bi bi-paperclip me-1"></i> View File
-              </a>
-            </div>
+            <!-- Attached File -->
+<div id="modalFileContainer" class="col-12 d-none">
+  <p class="mb-1 text-muted small">Attached File</p>
+  
+  <!-- الرابط العادي -->
+  <a id="modalFile" href="#" target="_blank" class="fw-semibold text-primary text-decoration-none d-inline-block mb-2">
+    <i class="bi bi-paperclip me-1"></i> View File
+  </a>
+
+  <!-- عارض 3D -->
+  <div id="modelViewerContainer" class="d-none border rounded shadow-sm">
+    <model-viewer id="modelViewer" 
+      src="" 
+      alt="3D Model"
+      camera-controls 
+      auto-rotate
+      shadow-intensity="1"
+      style="width: 100%; height: 400px; background-color: #fff; border-radius: 10px;">
+    </model-viewer>
+  </div>
+</div>
+
 
             <!-- Session Time -->
             <div class="col-12">
@@ -327,48 +374,114 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-request-btn').forEach(btn => {
       if (btn.dataset.bound) return;
       btn.dataset.bound = 'true';
+btn.addEventListener('click', (e) => {
+  e.stopPropagation();
 
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
+  const notifId = btn.dataset.notifId;
+  const notifType = btn.dataset.type;
+  const li = btn.closest('li[data-id]');
+  markAsRead(notifId, li);
 
-        const notifId = btn.dataset.notifId;
-        const li = btn.closest('li[data-id]');
-        markAsRead(notifId, li);
+  // المراجع للمودال
+  const modal = document.getElementById('requestModal');
+  const header = modal.querySelector('.modal-header');
+  const title = header.querySelector('.modal-title');
+  const modalClient = document.getElementById('modalClient');
+  const modalRequestId = document.getElementById('modalRequestId');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalFileContainer = document.getElementById('modalFileContainer');
+  const modelViewerContainer = document.getElementById('modelViewerContainer');
+  const modelViewer = document.getElementById('modelViewer');
+  const modalFile = document.getElementById('modalFile');
+  const modalZoomContainer = document.getElementById('modalZoomContainer');
+  const modalZoomLink = document.getElementById('modalZoomLink');
+  const modalSessionTime = document.getElementById('modalSessionTime');
+  const acceptBtn = document.getElementById('acceptBtn');
+  const rejectBtn = document.getElementById('rejectBtn');
 
-        // تعبئة تفاصيل المودال
-        document.getElementById('modalClient').textContent = btn.dataset.client;
-        document.getElementById('modalRequestId').textContent = btn.dataset.requestId;
-        document.getElementById('modalDescription').textContent = btn.dataset.description;
-        document.getElementById('acceptBtn').setAttribute('formaction', btn.dataset.acceptUrl);
-        document.getElementById('rejectBtn').setAttribute('formaction', btn.dataset.rejectUrl);
+  // تنظيف المودال
+  modalClient.textContent = "";
+  modalRequestId.textContent = "";
+  modalDescription.textContent = "";
+  modalFileContainer.classList.add("d-none");
+  modelViewerContainer.classList.add("d-none");
+  modalZoomContainer.classList.add("d-none");
+  acceptBtn.classList.add("d-none");
+  rejectBtn.classList.add("d-none");
+  header.className = "modal-header text-white"; // إزالة الألوان القديمة
+  title.innerHTML = `<i class="bi bi-bell"></i> Notification`;
 
-        // الملف المرفق
-        const fileContainer = document.getElementById('modalFileContainer');
-        if (btn.dataset.fileUrl) {
-          fileContainer.classList.remove('d-none');
-          document.getElementById('modalFile').setAttribute('href', btn.dataset.fileUrl);
-        } else {
-          fileContainer.classList.add('d-none');
-        }
+  // تخصيص حسب النوع
+  if (notifType === "project_request") {
+    header.classList.add("project_request");
+    title.innerHTML = `<i class="bi bi-file-earmark-text"></i> New Project Request`;
 
-        // وقت الجلسة
-        const sessionTimeDiv = document.getElementById('modalSessionTime');
-        if (btn.dataset.scheduledAt && btn.dataset.scheduledAt !== "None") {
-          const formattedDate = new Date(btn.dataset.scheduledAt).toLocaleString();
-          sessionTimeDiv.textContent = formattedDate;
-        } else {
-          sessionTimeDiv.textContent = "Not Scheduled Yet";
-        }
+    modalClient.textContent = btn.dataset.client;
+    modalRequestId.textContent = btn.dataset.requestId;
+    modalDescription.textContent = btn.dataset.description;
+    acceptBtn.classList.remove("d-none");
+    rejectBtn.classList.remove("d-none");
+  }
 
-        // رابط Zoom
-        const zoomContainer = document.getElementById('modalZoomContainer');
-        if (btn.dataset.zoomLink && btn.dataset.zoomLink !== "None") {
-          zoomContainer.classList.remove('d-none');
-          document.getElementById('modalZoomLink').setAttribute('href', btn.dataset.zoomLink);
-        } else {
-          zoomContainer.classList.add('d-none');
-        }
-      });
+  else if (notifType === "file_uploaded") {
+    header.classList.add("file_uploaded");
+    title.innerHTML = `<i class="bi bi-cloud-arrow-up"></i> Files Uploaded`;
+
+    modalDescription.textContent = "Engineer has uploaded new project files for you.";
+
+    if (btn.dataset.fileUrl) {
+      const fileUrl = btn.dataset.fileUrl;
+      const ext = fileUrl.split('.').pop().toLowerCase();
+
+      modalFileContainer.classList.remove("d-none");
+      modalFile.setAttribute("href", fileUrl);
+
+      if (ext === "gltf" || ext === "glb") {
+        modelViewerContainer.classList.remove("d-none");
+        modelViewer.setAttribute("src", fileUrl);
+      }
+    }
+  }
+
+  else if (notifType === "zoom_meeting") {
+    header.classList.add("zoom_meeting");
+    title.innerHTML = `<i class="bi bi-camera-video"></i> Zoom Meeting Scheduled`;
+
+    modalDescription.textContent = "Your project meeting has been scheduled on Zoom.";
+
+    if (btn.dataset.zoomLink) {
+      modalZoomContainer.classList.remove("d-none");
+      modalZoomLink.setAttribute("href", btn.dataset.zoomLink);
+    }
+
+    if (btn.dataset.scheduledAt) {
+      const formattedDate = new Date(btn.dataset.scheduledAt).toLocaleString();
+      modalSessionTime.textContent = formattedDate;
+    }
+  }
+
+  else {
+    header.classList.add("generic");
+    title.innerHTML = `<i class="bi bi-info-circle"></i> Notification`;
+    modalDescription.textContent = "Notification details are not available.";
+  }
+  // ✅ عرض وقت الجلسة في أي نوع إشعار فيه بيانات session
+if (btn.dataset.scheduledAt) {
+  const formattedDate = new Date(btn.dataset.scheduledAt).toLocaleString();
+  modalSessionTime.textContent = formattedDate;
+} else {
+  modalSessionTime.textContent = "Not Scheduled Yet";
+}
+
+// ✅ عرض رابط الزوم لو موجود (حتى لو الإشعار مش zoom_meeting)
+if (btn.dataset.zoomLink) {
+  modalZoomContainer.classList.remove("d-none");
+  modalZoomLink.setAttribute("href", btn.dataset.zoomLink);
+}
+
+});
+
+
     });
   }
 
@@ -402,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initViewButtons();
 });
 </script>
-
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 {% block extra_js %}{% endblock %}
 </body>

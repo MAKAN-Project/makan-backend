@@ -15,8 +15,8 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import make_aware
-
-
+from django.http import FileResponse, Http404
+from django.http import HttpResponse, Http404
 
 def home(request):
     selected_filter = request.GET.get('filter', 'All').lower()
@@ -88,4 +88,222 @@ def home(request):
     })
 
 
+def serve_3d_file(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'uploads', filename)
+    if not os.path.exists(file_path):
+        raise Http404("File not found")
 
+    ext = os.path.splitext(filename)[1].lower()
+    content_types = {
+        '.gltf': 'model/gltf+json',
+        '.glb': 'model/gltf-binary',
+        '.obj': 'text/plain',
+        '.stl': 'model/stl',
+    }
+    content_type = content_types.get(ext, 'application/octet-stream')
+
+    with open(file_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type=content_type)
+
+    # 👇 أهم سطرين
+    response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+    response['X-Content-Type-Options'] = 'nosniff'  # يمنع التحميل الإجباري
+
+    return response
+
+def projects(request):
+    """Display all projects with filtering by engineering specialization + include related project images"""
+    specialization_filter = request.GET.get('specialization', '')
+    
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Filter projects based on specialization - show only completed projects
+    if specialization_filter:
+        projects = ProjectRequest.objects.filter(
+            engineer__specialization=specialization_filter,
+            status='completed'
+        ).select_related('engineer', 'engineer__user', 'client').prefetch_related('files').order_by('-created_at')
+    else:
+        projects = ProjectRequest.objects.filter(
+            status='completed'
+        ).select_related('engineer', 'engineer__user', 'client').prefetch_related('files').order_by('-created_at')
+    
+    # Get display name for current filter
+    specialization_choices = dict(Engineer.SPECIALIZATION_CHOICES)
+    current_filter_display = specialization_choices.get(specialization_filter, 'All Projects')
+
+    # attach project images to each project
+    for project in projects:
+        all_files = project.files.all()
+        # شيلنا شرط الامتداد مؤقتًا لنتأكد إن الصور توصل
+        project.images = [f for f in all_files if f.file]
+
+        # ✅ لو حابب ترجع فلترة الامتداد بعدين:
+        # project.images = [f for f in all_files if f.file and f.file.url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
+
+    context = {
+        'projects': projects,
+        'current_filter': specialization_filter,
+        'current_filter_display': current_filter_display,
+        'pending_notifications': pending_notifications,
+    }
+
+    return render(request, 'projects.html', context)
+
+
+def engineers_list(request):
+    """Display all approved engineers with filtering by specialization"""
+    specialization_filter = request.GET.get('specialization', '')
+    
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Filter engineers based on specialization - show only approved engineers
+    if specialization_filter:
+        engineers = Engineer.objects.filter(
+            specialization=specialization_filter,
+            status='approved'
+        ).select_related('user').order_by('-created_at')
+    else:
+        engineers = Engineer.objects.filter(
+            status='approved'
+        ).select_related('user').order_by('-created_at')
+    
+    # Get display name for current filter
+    specialization_choices = dict(Engineer.SPECIALIZATION_CHOICES)
+    current_filter_display = specialization_choices.get(specialization_filter, 'All Engineers')
+    
+    context = {
+        'engineers': engineers,
+        'current_filter': specialization_filter,
+        'current_filter_display': current_filter_display,
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'engineers_list.html', context)
+
+
+def services(request):
+    """Display comprehensive services page"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    context = {
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'services.html', context)
+
+
+def about(request):
+    """Display comprehensive about page with vision and future features"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    context = {
+        'pending_notifications': pending_notifications,
+    }
+    
+    return render(request, 'about.html', context)
+
+
+def contact(request):
+    """Display contact page with team member information"""
+    # Get notifications for logged-in users
+    user = None
+    if request.session.get("user_id"):
+        try:
+            user = User.objects.get(user_id=request.session["user_id"])
+        except User.DoesNotExist:
+            user = None
+
+    if user:
+        pending_notifications = Notification.objects.filter(
+            recipient=user, is_read=False
+        ).select_related('sender', 'project_request', 'session').order_by('-created_at')[:5]
+    else:
+        pending_notifications = []
+    
+    # Team members information
+    team_members = [
+        {
+            'name': 'Mahmoud Shuman',
+            'role': 'CEO & Co-Founder',
+            'email': 'mahmoud.shuman@outlook.com',
+            'description': 'Visionary leader with extensive experience in architecture and technology innovation'
+        },
+        {
+            'name': 'Omyma Alkurd',
+            'role': 'CTO & Co-Founder',
+            'email': 'omyma_1994@hotmail.com',
+            'description': 'Technology expert specializing in AI-driven design solutions and platform development'
+        },
+        {
+            'name': 'Dalia Saymeh',
+            'role': 'Head of Engineering',
+            'email': 'dalia.saymeh@makan.com',
+            'description': 'Senior engineer with expertise in structural design and sustainable architecture'
+        },
+        {
+            'name': 'Hamza Sammour',
+            'role': 'Head of Operations',
+            'email': 'hamza.sammour@makan.com',
+            'description': 'Operations specialist focused on platform optimization and client success'
+        }
+    ]
+    
+    context = {
+        'pending_notifications': pending_notifications,
+        'team_members': team_members,
+    }
+    
+    return render(request, 'contact.html', context)
